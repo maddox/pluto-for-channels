@@ -15,6 +15,6 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
         repository: ${{ env.GITHUB_REPOSITORY }}
         tag_with_ref: true
-        push: ${{ startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/master' }}
+        push: ${{ startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main' }}
         always_pull: true
         add_git_labels: true
