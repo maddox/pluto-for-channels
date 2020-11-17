@@ -13,7 +13,7 @@ jobs:
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
-        repository: ${{ env.GITHUB_REPOSITORY }}
+        repository: jonmaddox/pluto-for-channels
         tag_with_ref: true
         push: ${{ startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main' }}
         always_pull: true
