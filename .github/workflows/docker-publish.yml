@@ -8,6 +8,11 @@ jobs:
     steps:
     - name: checkout
       uses: actions/checkout@v2
+    - name: Docker meta
+      id: docker_meta
+      uses: crazy-max/ghaction-docker-meta@v1
+      with:
+        images: jonmaddox/pluto-for-channels
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v1
     - name: Login to DockerHub
@@ -22,4 +27,4 @@ jobs:
         file: ./Dockerfile
         platforms: linux/amd64,linux/arm64,linux/arm/v6,linux/arm/v7,linux/386
         push: true
-        tags: jonmaddox/pluto-for-channels:latest
+        tags: ${{ steps.docker_meta.outputs.tags }}
