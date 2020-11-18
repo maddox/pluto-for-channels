@@ -29,4 +29,4 @@ jobs:
         push: true
         tags: |
           ${{ steps.docker_meta.outputs.tags }}
-          ${{ github.ref == 'refs/heads/main' && 'jonmaddox/pluto-for-channels:main' || '' }}
+          ${{ github.ref == 'refs/heads/main' && 'jonmaddox/pluto-for-channels:latest' || '' }}
