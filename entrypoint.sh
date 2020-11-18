@@ -8,7 +8,7 @@ NGINX_ROOT=/usr/share/nginx/html
 
 while :
 do
-  node index.js forChannels
+  node index.js $START_CHANNEL_NUMBER
   LAST_RAN=date
   sed "s/XXX/$($LAST_RAN)/g" index.html > "$NGINX_ROOT/index.html"
   mv playlist.m3u "$NGINX_ROOT/playlist.m3u"
