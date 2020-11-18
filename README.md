@@ -10,9 +10,7 @@ This simple Docker image will generate an M3U playlist and EPG optimized for use
 
 Running the container is easy. Fire up the container as usual. You can set which port it runs on.
 
-    docker run -d --name pluto-for-channels -p 8080:80 -e START_CHANNEL_NUMBER=500 jonmaddox/pluto-for-channels
-
-You can optionally set the start channel number via the `START_CHANNEL_NUMBER` env var.
+    docker run -d --name pluto-for-channels -p 8080:80 jonmaddox/pluto-for-channels
 
 You can retrieve the playlist and EPG via:
 
