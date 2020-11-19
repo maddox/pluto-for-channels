@@ -1,4 +1,4 @@
-FROM hoosin/alpine-nginx-nodejs:latest
+FROM jonmaddox/alpine-nginx-nodejs-plus:latest
 
 ARG pluto_iptv_sha=954c9e1c5214986aa1dc95633ddad2071b8f87de
 
