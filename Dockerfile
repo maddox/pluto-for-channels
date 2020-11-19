@@ -18,6 +18,6 @@ ADD index.html /usr/src/app/index.html
 RUN wget https://github.com/maddox/PlutoIPTV/archive/$pluto_iptv_sha.zip
 RUN unzip -j $pluto_iptv_sha.zip
 RUN rm $pluto_iptv_sha.zip
-RUN yarn
+RUN npm install
 
 ENTRYPOINT ["/usr/src/app/entrypoint.sh"]
