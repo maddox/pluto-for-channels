@@ -1,4 +1,13 @@
-FROM jonmaddox/alpine-nginx-nodejs-plus:latest
+FROM nginx:1.19.4
+LABEL maintainer="Jon Maddox <jon@jonmaddox.com>"
+
+# Install nvm with node and npm
+RUN apk add --no-cache --repository http://nl.alpinelinux.org/alpine/edge/main libuv \
+    && apk add --no-cache --update-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/main nodejs=12.19.0-r0 nodejs-npm=12.19.0-r0 \
+    && apk add --no-cache --update-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/community yarn=1.22.10-r0 \
+    && echo "NodeJS Version:" "$(node -v)" \
+    && echo "NPM Version:" "$(npm -v)" \
+    && echo "Yarn Version:" "$(yarn -v)"
 
 ARG pluto_iptv_sha=954c9e1c5214986aa1dc95633ddad2071b8f87de
 
