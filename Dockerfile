@@ -1,4 +1,4 @@
-FROM nginx:1.19.4
+FROM nginx:1.19-alpine
 LABEL maintainer="Jon Maddox <jon@jonmaddox.com>"
 
 # Install nvm with node and npm
