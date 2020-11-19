@@ -1,6 +1,6 @@
 FROM hoosin/alpine-nginx-nodejs:latest
 
-ARG pluto_iptv_sha=f969a8b3505f40eabebf49485394cd958ca1b74c
+ARG pluto_iptv_sha=b79214b533dbb2a250d9a45a9a90d2188bd9df1a
 
 WORKDIR /usr/src/app
 ADD entrypoint.sh /usr/src/app/entrypoint.sh
