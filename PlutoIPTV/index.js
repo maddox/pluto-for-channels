@@ -171,7 +171,7 @@ ${m3uUrl}
           { name: 'display-name', text: channel.name },
           { name: 'display-name', text: channel.number },
           { name: 'desc', text: channel.summary },
-          { name: 'icon', attrs: { src: channel.solidLogoPNG.path } },
+          { name: 'icon', attrs: { src: channel.colorLogoPNG.path } },
         ],
       });
 
