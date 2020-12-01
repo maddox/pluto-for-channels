@@ -232,7 +232,7 @@ ${m3uUrl}
               },
               {
                 name: 'date',
-                text: moment(programme.episode.firstAired).format('YYYYMMDD'),
+                text: moment(programme.episode.originalReleaseDate).format('YYYYMMDD'),
               },
               {
                 name: 'category',
