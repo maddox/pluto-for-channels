@@ -189,7 +189,7 @@ ${m3uUrl}
           );
 
           let isMovie = programme.episode.series.type == "film";
-
+          
           let channelsGenres = [];
           [["Children", kidsGenres], ["News", newsGenres], ["Sports", sportsGenres], ["Drama", dramaGenres]].forEach((genrePackage) => {
             genreName = genrePackage[0]
@@ -217,14 +217,6 @@ ${m3uUrl}
             children: [
               { name: 'title', attrs: { lang: 'en' }, text: programme.title },
               { name: 'icon', attrs: { src: airingArt } },
-              {
-                name: 'sub-title',
-                attrs: { lang: 'en' },
-                text:
-                  programme.title == programme.episode.name
-                    ? ''
-                    : programme.episode.name,
-              },
               {
                 name: 'desc',
                 attrs: { lang: 'en' },
@@ -275,6 +267,18 @@ ${m3uUrl}
               }
             )
           })
+          
+          if (!isMovie) {
+            airing.children.push(
+              { name: 'sub-title',
+                attrs: { lang: 'en' },
+                text:
+                  programme.title == programme.episode.name
+                    ? ''
+                    : programme.episode.name,
+              }
+            )
+          }
 
           tv.push(airing)
         });
