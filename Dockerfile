@@ -10,6 +10,7 @@ RUN apk add --no-cache libuv \
     && echo "Yarn Version:" "$(yarn -v)"
 
 WORKDIR /usr/src/app
+ADD VERSION /usr/src/app/VERSION
 ADD entrypoint.sh /usr/src/app/entrypoint.sh
 ADD index.html /usr/src/app/index.html
 
