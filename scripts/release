@@ -1,0 +1,17 @@
+#!/bin/sh
+
+if [[ $# -eq 0 ]] ; then
+    echo 'Please include a version number: ie, 1.0.22'
+    exit 0
+fi
+
+cat <<EOF > VERSION
+$1
+EOF
+
+echo "Creating release and pushing it to GitHub..."
+git tag $1
+git push --tags
+
+echo "Opening release for editing..."
+open "https://github.com/maddox/pluto-for-channels/releases/edit/$1"
