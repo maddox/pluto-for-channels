@@ -11,6 +11,7 @@ EOF
 
 echo "Creating release and pushing it to GitHub..."
 git commit -am "Bump to $1"
+git push
 git tag $1
 git push --tags
 
