@@ -105,7 +105,7 @@ plutoIPTV.grabJSON(function (channels) {
   channels.forEach((channel) => {
     let deviceId = uuid1();
     let sid = uuid4();
-    if (channel.isStitched && !channel.slug.match(/^announcement/)) {
+    if (channel.isStitched && !channel.slug.match(/^announcement|^privacy-policy/)) {
       let m3uUrl = new URL(channel.stitched.urls[0].url);
       let queryString = url.search;
       let params = new URLSearchParams(queryString);
@@ -163,7 +163,7 @@ ${m3uUrl}
   // Channels //
   //////////////
   channels.forEach((channel) => {
-    if (channel.isStitched && !channel.slug.match(/^announcement|^privacy/)) {
+    if (channel.isStitched && !channel.slug.match(/^announcement|^privacy-policy/)) {
       tv.push({
         name: 'channel',
         attrs: { id: channel.slug },
