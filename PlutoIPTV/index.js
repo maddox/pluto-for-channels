@@ -163,7 +163,7 @@ ${m3uUrl}
   // Channels //
   //////////////
   channels.forEach((channel) => {
-    if (channel.isStitched && !channel.slug.match(/^announcement/)) {
+    if (channel.isStitched && !channel.slug.match(/^announcement|^privacy/)) {
       tv.push({
         name: 'channel',
         attrs: { id: channel.slug },
