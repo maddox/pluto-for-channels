@@ -255,6 +255,11 @@ ${m3uUrl}
               },
               {
                 name: 'episode-num',
+                attrs: { system: 'pluto' },
+                text: programme.episode._id,
+              },
+              {
+                name: 'episode-num',
                 attrs: { system: 'original-air-date' },
                 text: programme.episode.clip.originalReleaseDate,
               },
