@@ -12,7 +12,6 @@ Running the container is easy. Fire up the container as usual. You can set which
 
     docker run -d --restart unless-stopped --name pluto-for-channels -p 8080:80 jonmaddox/pluto-for-channels
 
-You can retrieve the playlist and EPG via:
+You can retrieve the playlist and EPG via the status page.
 
-    http://127.0.0.1:8080/playlist.m3u
-    http://127.0.0.1:8080/epg.xml
+    http://127.0.0.1:8080
