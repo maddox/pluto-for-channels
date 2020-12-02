@@ -32,6 +32,6 @@ do
 
   mv playlist.m3u "$NGINX_ROOT/playlist.m3u"
   mv epg.xml "$NGINX_ROOT/epg.xml"
-  echo "Last ran: $($LAST_RAN)"
+  echo "Last ran: $LAST_RAN"
   sleep 10800 # run every 3 hours
 done
