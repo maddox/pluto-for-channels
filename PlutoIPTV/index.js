@@ -195,7 +195,9 @@ ${m3uUrl}
             genreName = genrePackage[0]
             genres = genrePackage[1]
 
-            if (genres.includes(programme.episode.genre) || genres.includes(programme.episode.subGenre) || genres.includes(channel.category)) {
+            if (genres.includes(programme.episode.genre) || 
+                genres.includes(programme.episode.subGenre) ||
+                genres.includes(channel.category)) {
               channelsGenres.push(genreName)
             }
           })
