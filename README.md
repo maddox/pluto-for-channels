@@ -24,7 +24,7 @@ Add a new source in Channels DVR Server and choose `M3U Playlist`. Fill out the 
 
 <img src=".github/1.png" width="400px"/>
 
-Next, add a lineup for your new source and choose custom URL.
+Next, set the provider for your new source and choose custom URL.
 
 <img src=".github/2.png" width="300px"/>
 
