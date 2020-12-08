@@ -22,12 +22,12 @@ Once you have your Pluto M3U and EPG XML available, you can use it to [custom ch
 
 Add a new source in Channels DVR Server and choose `M3U Playlist`. Fill out the form using your new playlist URL.
 
-![add source](.github/1.png)
+<img src=".github/1.png" width="400px"/>
 
 Next, add a lineup for your new source and choose custom URL.
 
-![add source](.github/2.png)
+<img src=".github/2.png" width="300px"/>
 
 Finally, enter your EPG xml url and set it to refresh every 6 hours.
 
-![add source](.github/3.png)
+<img src=".github/3.png" width="500px"/>
