@@ -203,7 +203,7 @@ ${m3uUrl}
           })
 
           let airingArt
-          if (isMovie) {
+          if (isMovie && null != programme.episode.poster) {
             airingArt = programme.episode.poster.path
           } else {
             airingArt = programme.episode.series.tile.path.replace("w=660", "w=900").replace("h=660", "h=900")
