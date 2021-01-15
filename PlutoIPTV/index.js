@@ -13,6 +13,12 @@ const newsGenres = ["News + Opinion", "General News"];
 const sportsGenres = ["Sports", "Sports & Sports Highlights", "Sports Documentaries"];
 const dramaGenres = ["Crime", "Action & Adventure", "Thrillers", "Romance", "Sci-Fi & Fantasy", "Teen Dramas", "Film Noir", "Romantic Comedies", "Indie Dramas", "Romance Classics", "Crime Action", "Action Sci-Fi & Fantasy", "Action Thrillers", "Crime Thrillers", "Political Thrillers", "Classic Thrillers", "Classic Dramas", "Sci-Fi Adventure", "Romantic Dramas", "Mystery", "Psychological Thrillers", "Foreign Classic Dramas", "Classic Westerns", "Westerns", "Sci-Fi Dramas", "Supernatural Thrillers", "Mobster", "Action Classics", "African-American Action", "Suspense", "Family Dramas", "Alien Sci-Fi", "Sci-Fi Cult Classics"];
 
+versions = ['main']
+
+if (process.argv[2]) {
+  versions = versions.concat(process.argv[2].split(','))
+}
+
 const plutoIPTV = {
   grabJSON: function (callback) {
     callback = callback || function () {};
