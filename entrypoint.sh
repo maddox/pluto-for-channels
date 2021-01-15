@@ -25,7 +25,17 @@ do
     UPDATE_AVAILABLE="\<a href='https\:\/\/github.com\/maddox\/pluto-for-channels\/releases\/tag\/$LATEST_VERSION'\>\<span class='tag is-warning'\\>UPDATE AVAILABLE\: $LATEST_VERSION\<\/span\>\<\/a\>"
   fi
   
+  LINKED_VERSIONS=""
+  
+  for i in $(echo $VERSIONS | sed "s/,/ /g")
+  do
+    LINKED_VERSIONS="$LINKED_VERSIONS \<ul\>\<li\>\<a href='\/$i-playlist.m3u'\>$i Playlist\<\/a\>\<\/li\>\<li\>\<a href='\/$i-epg.xml'\>$i EPG\<\/a\>\<\/li\>\<\/ul\>"
+  done
+  
+  echo $LINKED_VERSIONS
+  
   sed -e "s/LAST_RAN/$LAST_RAN/g" \
+  -e "s/LINKED_VERSIONS/$LINKED_VERSIONS/g" \
   -e "s/VERSION/$CURRENT_VERSION/g" \
   -e "s/UPDATE_AVAILABLE/$UPDATE_AVAILABLE/g" \
   index.html > "$NGINX_ROOT/index.html"
