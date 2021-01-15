@@ -308,7 +308,7 @@ ${m3uUrl}
   );
     
   epgFileName = version == 'main' ? 'epg.xml' : `${version}-epg.xml`
-  playlistFileName = version == 'main' ? 'playlist.xml' : `${version}-playlist.m3u`
+  playlistFileName = version == 'main' ? 'playlist.m3u' : `${version}-playlist.m3u`
   
   fs.writeFileSync(epgFileName, epg);
   console.log(`[SUCCESS] Wrote the EPG to ${epgFileName}!`);
