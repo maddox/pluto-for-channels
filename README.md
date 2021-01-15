@@ -15,6 +15,15 @@ Running the container is easy. Fire up the container as usual. You can set which
 You can retrieve the playlist and EPG via the status page.
 
     http://127.0.0.1:8080
+    
+### Optionally have multiple feeds generated
+
+By using the `VERSIONS` env var when starting the docker container, you can tell it to create multiple feeds that can be used elsewhere.
+
+Simpley provide a comma separated list of words without spaces with the `VERSIONS` env var.
+
+    docker run -d --restart unless-stopped --name pluto-for-channels -p 8080:80 -e VERSIONS=Dad,Bob,Joe jonmaddox/pluto-for-channels
+
 
 ## Add Source to Channels
 
