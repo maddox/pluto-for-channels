@@ -102,7 +102,7 @@ const plutoIPTV = {
 
 module.exports = plutoIPTV;
 
-plutoIPTV.grabJSON(function (channels) {
+function processChannels(version, channels){
   ///////////////////
   // M3U8 Playlist //
   ///////////////////
@@ -306,10 +306,19 @@ ${m3uUrl}
       escape: true,
     }
   );
-
-  fs.writeFileSync('epg.xml', epg);
+    
+  epgFileName = version == 'main' ? 'epg.xml' : `${version}-epg.xml`
+  playlistFileName = version == 'main' ? 'playlist.xml' : `${version}-playlist.m3u8`
+  
+  fs.writeFileSync(epgFileName, epg);
   console.log('[SUCCESS] Wrote the EPG to epg.xml!');
 
-  fs.writeFileSync('playlist.m3u', m3u8);
+  fs.writeFileSync(playlistFileName, m3u8);
   console.log('[SUCCESS] Wrote the M3U8 tuner to playlist.m3u8!');
-});
+}
+
+versions.forEach((version) => {
+  plutoIPTV.grabJSON(function (channels) {
+    processChannels(version, channels)
+  });
+})
