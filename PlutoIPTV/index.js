@@ -308,13 +308,13 @@ ${m3uUrl}
   );
     
   epgFileName = version == 'main' ? 'epg.xml' : `${version}-epg.xml`
-  playlistFileName = version == 'main' ? 'playlist.xml' : `${version}-playlist.m3u8`
+  playlistFileName = version == 'main' ? 'playlist.xml' : `${version}-playlist.m3u`
   
   fs.writeFileSync(epgFileName, epg);
   console.log('[SUCCESS] Wrote the EPG to epg.xml!');
 
   fs.writeFileSync(playlistFileName, m3u8);
-  console.log('[SUCCESS] Wrote the M3U8 tuner to playlist.m3u8!');
+  console.log('[SUCCESS] Wrote the M3U8 tuner to playlist.m3u!');
 }
 
 versions.forEach((version) => {
