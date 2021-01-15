@@ -13,6 +13,12 @@ const newsGenres = ["News + Opinion", "General News"];
 const sportsGenres = ["Sports", "Sports & Sports Highlights", "Sports Documentaries"];
 const dramaGenres = ["Crime", "Action & Adventure", "Thrillers", "Romance", "Sci-Fi & Fantasy", "Teen Dramas", "Film Noir", "Romantic Comedies", "Indie Dramas", "Romance Classics", "Crime Action", "Action Sci-Fi & Fantasy", "Action Thrillers", "Crime Thrillers", "Political Thrillers", "Classic Thrillers", "Classic Dramas", "Sci-Fi Adventure", "Romantic Dramas", "Mystery", "Psychological Thrillers", "Foreign Classic Dramas", "Classic Westerns", "Westerns", "Sci-Fi Dramas", "Supernatural Thrillers", "Mobster", "Action Classics", "African-American Action", "Suspense", "Family Dramas", "Alien Sci-Fi", "Sci-Fi Cult Classics"];
 
+versions = ['main']
+
+if (process.argv[2]) {
+  versions = versions.concat(process.argv[2].split(','))
+}
+
 const plutoIPTV = {
   grabJSON: function (callback) {
     callback = callback || function () {};
@@ -96,7 +102,7 @@ const plutoIPTV = {
 
 module.exports = plutoIPTV;
 
-plutoIPTV.grabJSON(function (channels) {
+function processChannels(version, channels){
   ///////////////////
   // M3U8 Playlist //
   ///////////////////
@@ -300,10 +306,19 @@ ${m3uUrl}
       escape: true,
     }
   );
+    
+  epgFileName = version == 'main' ? 'epg.xml' : `${version}-epg.xml`
+  playlistFileName = version == 'main' ? 'playlist.m3u' : `${version}-playlist.m3u`
+  
+  fs.writeFileSync(epgFileName, epg);
+  console.log(`[SUCCESS] Wrote the EPG to ${epgFileName}!`);
 
-  fs.writeFileSync('epg.xml', epg);
-  console.log('[SUCCESS] Wrote the EPG to epg.xml!');
+  fs.writeFileSync(playlistFileName, m3u8);
+  console.log(`[SUCCESS] Wrote the M3U8 tuner to ${playlistFileName}!`);
+}
 
-  fs.writeFileSync('playlist.m3u', m3u8);
-  console.log('[SUCCESS] Wrote the M3U8 tuner to playlist.m3u8!');
-});
+versions.forEach((version) => {
+  plutoIPTV.grabJSON(function (channels) {
+    processChannels(version, channels)
+  });
+})
