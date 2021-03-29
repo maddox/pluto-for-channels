@@ -232,7 +232,7 @@ ${m3uUrl}
     ) {
       tv.push({
         name: "channel",
-        attrs: { id: `pluto-${channel.slug}` },
+        attrs: { id: channel.slug },
         children: [
           { name: "display-name", text: channel.name },
           { name: "display-name", text: channel.number },
@@ -289,7 +289,7 @@ ${m3uUrl}
             attrs: {
               start: moment(programme.start).format("YYYYMMDDHHmmss ZZ"),
               stop: moment(programme.stop).format("YYYYMMDDHHmmss ZZ"),
-              channel: `pluto-${channel.slug}`,
+              channel: channel.slug,
             },
             children: [
               { name: "title", attrs: { lang: "en" }, text: programme.title },
