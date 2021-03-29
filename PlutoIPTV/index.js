@@ -8,6 +8,8 @@ const uuid4 = require("uuid").v4;
 const uuid1 = require("uuid").v1;
 const url = require("url");
 
+const conflictingChannels = ["cnn"];
+
 const kidsGenres = [
   "Kids",
   "Children & Family",
@@ -192,7 +194,9 @@ function processChannels(version, channels) {
       m3uUrl.search = params.toString();
       m3uUrl = m3uUrl.toString();
 
-      let slug = channel.slug;
+      let slug = conflictingChannels.includes(channel.slug)
+        ? `pluto-${channel.slug}`
+        : channel.slug;
       let logo = channel.colorLogoPNG.path;
       let group = channel.category;
       let name = channel.name;
@@ -226,6 +230,10 @@ ${m3uUrl}
   // Channels //
   //////////////
   channels.forEach((channel) => {
+    channel.slug = conflictingChannels.includes(channel.slug)
+      ? `pluto-${channel.slug}`
+      : channel.slug;
+
     if (
       channel.isStitched &&
       !channel.slug.match(/^announcement|^privacy-policy/)
