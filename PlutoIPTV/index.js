@@ -262,6 +262,12 @@ ${m3uUrl}
               "."
           );
 
+          let episodeParts = programme.episode.description.match(/\(([Ss](\d+)[Ee](\d+))\)/)
+          let episodeNumberString
+          if (episodeParts){
+            episodeNumberString = episodeParts[1]
+          }
+
           let isMovie = programme.episode.series.type == "film";
 
           let channelsGenres = [];
@@ -338,7 +344,7 @@ ${m3uUrl}
               {
                 name: "episode-num",
                 attrs: { system: "onscreen" },
-                text: programme.episode.number,
+                text: episodeNumberString || programme.episode.number,
               },
               {
                 name: "episode-num",
