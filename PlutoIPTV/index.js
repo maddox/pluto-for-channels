@@ -118,6 +118,69 @@ const movieGenres = [
   [["Mystery"], ["Suspense"]],
 ];
 
+const seriesGenres = [
+  [
+    ["Animated"],
+    [
+      "Family Animation",
+      "Cartoons",
+      "Action Sci-Fi & Fantasy",
+      "Action Thrillers",
+      "Action Classics",
+      "African-American Action",
+    ],
+  ],
+  [["Educational"], ["Education & Guidance", "Instructional & Educational"]],
+  [["News"], ["News and Information", "General News"]],
+  [["History"], ["History & Social Studies"]],
+  [["Politics"], ["Politics"]],
+  [["Action"], ["Action & Adventure", "Action Classics", "Crime Action"]],
+  [["Adventure"], ["Action & Adventure", "Adventures", "Sci-Fi Adventure"]],
+  [
+    ["Reality"],
+    [
+      "Reality",
+      "Reality Drama",
+      "Courtroom Reality",
+      "Occupational Reality",
+      "Celebrity Reality",
+    ],
+  ],
+  [["Competition reality"], ["Competition Reality"]],
+  [
+    ["Documentary"],
+    [
+      "Documentaries",
+      "Social & Cultural Documentaries",
+      "Science and Nature Documentaries",
+      "Miscellaneous Documentaries",
+      "Crime Documentaries",
+      "Travel & Adventure Documentaries",
+      "Sports Documentaries",
+      "Military Documentaries",
+      "Political Documentaries",
+      "Foreign Documentaries",
+      "Religion & Mythology Documentaries",
+      "Historical Documentaries",
+      "Biographical Documentaries",
+      "Faith & Spirituality Documentaries",
+    ],
+  ],
+  [["Biography"], ["Biographical Documentaries", "Inspirational Biographies"]],
+  [["Talk"], ["Talk & Variety", "Talk Show"]],
+  [["Variety"], ["Talk & Variety", "Sketch Comedies"]],
+  [["Home Improvement"], ["Art & Design", "DIY & How To", "Home Improvement"]],
+  [["House/garden"], ["Home & Garden"]],
+  [["Science"], ["Science and Nature Documentaries"]],
+  [["Nature"], ["Science and Nature Documentaries", "Animals"]],
+  [["Cooking"], ["Cooking Instruction", "Food & Wine", "Food Stories"]],
+  [["Travel"], ["Travel & Adventure Documentaries", "Travel"]],
+  [["Western"], ["Westerns", "Classic Westerns"]],
+  [["LGBTQ"], ["Gay & Lesbian", "Gay & Lesbian Dramas", "Gay"]],
+  [["Game show"], ["Game Show"]],
+  [["War"], ["Classic War Stories"]],
+];
+
 versions = ["main"];
 
 if (process.argv[2]) {
@@ -281,7 +344,6 @@ ${m3uUrl}
   // XMLTV Programme Guide //
   ///////////////////////////
   let tv = [];
-  let thegenres = [];
 
   //////////////
   // Channels //
@@ -330,7 +392,7 @@ ${m3uUrl}
           let isMovie = programme.episode.series.type == "film";
 
           let channelsGenres = [];
-          let mogrifiedGenres = [...movieGenres];
+          let mogrifiedGenres = [...movieGenres, ...seriesGenres];
           mogrifiedGenres.push(["Children", kidsGenres]);
           mogrifiedGenres.push(["News", newsGenres]);
           mogrifiedGenres.push(["Sports", sportsGenres]);
