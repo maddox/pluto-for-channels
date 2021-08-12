@@ -62,6 +62,62 @@ const dramaGenres = [
   "Sci-Fi Cult Classics",
 ];
 
+const movieGenres = [
+  [
+    ["Action"],
+    [
+      "Action & Adventure",
+      "Crime Action",
+      "Action Sci-Fi & Fantasy",
+      "Action Thrillers",
+      "Action Classics",
+      "African-American Action",
+    ],
+  ],
+  [["Adventure"], ["Action & Adventure", "Sci-Fi Adventure"]],
+  [["Crime"], ["Crime Action", "Crime Thrillers"]],
+  [["Documentary"], ["Documentaries"]],
+  [
+    ["Thriller"],
+    [
+      "Thrillers",
+      "Action Thrillers",
+      "Crime Thrillers",
+      "Political Thrillers",
+      "Classic Thrillers",
+      "Psychological Thrillers",
+      "Supernatural Thrillers",
+    ],
+  ],
+  [
+    ["Sci-Fi"],
+    [
+      "Sci-Fi & Fantasy",
+      "Action Sci-Fi & Fantasy",
+      "Sci-Fi Adventure",
+      "Sci-Fi Dramas",
+      "Alien Sci-Fi",
+      "Sci-Fi Cult Classics",
+    ],
+  ],
+  [["Fantasy"], ["Sci-Fi & Fantasy", "Action Sci-Fi & Fantasy"]],
+  [
+    ["Drama"],
+    [
+      "Teen Dramas",
+      "Indie Dramas",
+      "Classic Dramas",
+      "Romantic Dramas",
+      "Sci-Fi Dramas",
+      "Family Dramas",
+    ],
+  ],
+  [["Romantic comedy"], ["Romantic Comedies"]],
+  [["Romance"], ["Romance", "Romance Classics", "Romantic Dramas"]],
+  [["Western"], ["Classic Westerns", "Westerns"]],
+  [["Mystery"], ["Suspense"]],
+];
+
 versions = ["main"];
 
 if (process.argv[2]) {
@@ -225,6 +281,7 @@ ${m3uUrl}
   // XMLTV Programme Guide //
   ///////////////////////////
   let tv = [];
+  let thegenres = [];
 
   //////////////
   // Channels //
@@ -262,21 +319,24 @@ ${m3uUrl}
               "."
           );
 
-          let episodeParts = programme.episode.description.match(/\(([Ss](\d+)[Ee](\d+))\)/)
-          let episodeNumberString
-          if (episodeParts){
-            episodeNumberString = episodeParts[1]
+          let episodeParts = programme.episode.description.match(
+            /\(([Ss](\d+)[Ee](\d+))\)/
+          );
+          let episodeNumberString;
+          if (episodeParts) {
+            episodeNumberString = episodeParts[1];
           }
 
           let isMovie = programme.episode.series.type == "film";
 
           let channelsGenres = [];
-          [
-            ["Children", kidsGenres],
-            ["News", newsGenres],
-            ["Sports", sportsGenres],
-            ["Drama", dramaGenres],
-          ].forEach((genrePackage) => {
+          let mogrifiedGenres = [...movieGenres];
+          mogrifiedGenres.push(["Children", kidsGenres]);
+          mogrifiedGenres.push(["News", newsGenres]);
+          mogrifiedGenres.push(["Sports", sportsGenres]);
+          mogrifiedGenres.push(["Drama", dramaGenres]);
+
+          mogrifiedGenres.forEach((genrePackage) => {
             genreName = genrePackage[0];
             genres = genrePackage[1];
 
@@ -361,7 +421,11 @@ ${m3uUrl}
             ],
           };
 
-          channelsGenres.forEach((genre) => {
+          let uniqueGenres = channelsGenres.filter(function (item, pos) {
+            return channelsGenres.indexOf(item) == pos;
+          });
+
+          uniqueGenres.forEach((genre) => {
             airing.children.push({
               name: "category",
               attrs: { lang: "en" },
