@@ -166,6 +166,7 @@ const seriesGenres = [
     ],
   ],
   [["Biography"], ["Biographical Documentaries", "Inspirational Biographies"]],
+  [["Thriller"], ["Sci-Fi Thrillers", "Thrillers", "Crime Thrillers"]],
   [["Talk"], ["Talk & Variety", "Talk Show"]],
   [["Variety"], ["Sketch Comedies"]],
   [["Home Improvement"], ["Art & Design", "DIY & How To", "Home Improvement"]],
@@ -178,6 +179,36 @@ const seriesGenres = [
   [["LGBTQ"], ["Gay & Lesbian", "Gay & Lesbian Dramas", "Gay"]],
   [["Game show"], ["Game Show"]],
   [["Military"], ["Classic War Stories"]],
+  [
+    ["Comedy"],
+    [
+      "Cult Comedies",
+      "Spoofs and Satire",
+      "Slapstick",
+      "Classic Comedies",
+      "Stand-Up",
+      "Sports Comedies",
+      "African-American Comedies",
+      "Showbiz Comedies",
+      "Sketch Comedies",
+      "Teen Comedies",
+      "Latino Comedies",
+      "Family Comedies",
+    ],
+  ],
+  [["Crime"], ["Crime Action", "Crime Drama"]],
+  [["Crime drama"], ["Crime Drama"]],
+  [
+    ["Drama"],
+    [
+      "Classic Dramas",
+      "Family Drama",
+      "Indie Drama",
+      "Romantic Drama",
+      "Crime Drama",
+    ],
+  ],
+  [["Newsmagazine"], ["Investigative Journalism"]],
 ];
 
 versions = ["main"];
