@@ -124,7 +124,16 @@ const seriesGenres = [
   [["News"], ["News and Information", "General News"]],
   [["History"], ["History & Social Studies"]],
   [["Politics"], ["Politics"]],
-  [["Action"], ["Action & Adventure", "Action Classics", "Crime Action"]],
+  [
+    ["Action"],
+    [
+      "Action & Adventure",
+      "Action Classics",
+      "Martial Arts",
+      "Crime Action",
+      "Family Adventures",
+    ],
+  ],
   [["Adventure"], ["Action & Adventure", "Adventures", "Sci-Fi Adventure"]],
   [
     ["Reality"],
