@@ -145,7 +145,6 @@ const seriesGenres = [
       "Celebrity Reality",
     ],
   ],
-  [["Competition reality"], ["Competition Reality"]],
   [
     ["Documentary"],
     [
