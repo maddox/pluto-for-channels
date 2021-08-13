@@ -168,7 +168,7 @@ const seriesGenres = [
   [["Western"], ["Westerns", "Classic Westerns"]],
   [["LGBTQ"], ["Gay & Lesbian", "Gay & Lesbian Dramas", "Gay"]],
   [["Game show"], ["Game Show"]],
-  [["War"], ["Classic War Stories"]],
+  [["Military"], ["Classic War Stories"]],
 ];
 
 versions = ["main"];
