@@ -208,7 +208,6 @@ const seriesGenres = [
       "Crime Drama",
     ],
   ],
-  [["Newsmagazine"], ["Investigative Journalism"]],
 ];
 
 versions = ["main"];
