@@ -119,17 +119,7 @@ const movieGenres = [
 ];
 
 const seriesGenres = [
-  [
-    ["Animated"],
-    [
-      "Family Animation",
-      "Cartoons",
-      "Action Sci-Fi & Fantasy",
-      "Action Thrillers",
-      "Action Classics",
-      "African-American Action",
-    ],
-  ],
+  [["Animated"], ["Family Animation", "Cartoons"]],
   [["Educational"], ["Education & Guidance", "Instructional & Educational"]],
   [["News"], ["News and Information", "General News"]],
   [["History"], ["History & Social Studies"]],
