@@ -90,7 +90,7 @@ const movieGenres = [
     ],
   ],
   [
-    ["Sci-Fi"],
+    ["Science fiction"],
     [
       "Sci-Fi & Fantasy",
       "Action Sci-Fi & Fantasy",
