@@ -158,7 +158,7 @@ const seriesGenres = [
   ],
   [["Biography"], ["Biographical Documentaries", "Inspirational Biographies"]],
   [["Talk"], ["Talk & Variety", "Talk Show"]],
-  [["Variety"], ["Talk & Variety", "Sketch Comedies"]],
+  [["Variety"], ["Sketch Comedies"]],
   [["Home Improvement"], ["Art & Design", "DIY & How To", "Home Improvement"]],
   [["House/garden"], ["Home & Garden"]],
   [["Science"], ["Science and Nature Documentaries"]],
