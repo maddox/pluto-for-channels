@@ -399,14 +399,12 @@ ${m3uUrl}
       //////////////
       // Episodes //
       //////////////
+      console.log("[INFO] Processing channel " + channel.name)
       if (channel.timelines) {
         channel.timelines.forEach((programme) => {
           console.log(
-            "[INFO] Adding instance of " +
-              programme.title +
-              " to channel " +
-              channel.name +
-              "."
+            "[INFO]     Adding instance of " +
+              programme.title
           );
 
           let episodeParts = programme.episode.description.match(
