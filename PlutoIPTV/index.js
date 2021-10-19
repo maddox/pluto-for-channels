@@ -413,6 +413,10 @@ ${m3uUrl}
           let episodeNumberString;
           if (episodeParts) {
             episodeNumberString = episodeParts[1];
+          } else if (programme.episode.season > 0 && programme.episode.number > 0) {
+            episodeNumberString = `S${programme.episode.season}E${programme.episode.number}`
+          } else if (programme.episode.number > 0) {
+            episodeNumberString = `${programme.episode.number}`
           }
 
           let isMovie = programme.episode.series.type == "film";
@@ -505,11 +509,11 @@ ${m3uUrl}
                 text: programme.episode.subGenre,
             })
           }
-          if (episodeNumberString || (programme.episode.number && programme.episode.number > 0 && !isMovie)) {
+          if (episodeNumberString && !isMovie) {
             airing.children.push({
                 name: "episode-num",
                 attrs: { system: "onscreen" },
-                text: episodeNumberString || programme.episode.number,
+                text: episodeNumberString,
             })
           }
           if (!isMovie) {
