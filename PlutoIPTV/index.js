@@ -457,11 +457,6 @@ ${m3uUrl}
               { name: "title", attrs: { lang: "en" }, text: programme.title },
               { name: "icon", attrs: { src: airingArt } },
               {
-                name: "desc",
-                attrs: { lang: "en" },
-                text: programme.episode.description,
-              },
-              {
                 name: "date",
                 text: moment(
                   programme.episode.clip
@@ -475,29 +470,9 @@ ${m3uUrl}
                 text: isMovie ? "Movie" : "Series",
               },
               {
-                name: "category",
-                attrs: { lang: "en" },
-                text: programme.episode.genre,
-              },
-              {
-                name: "category",
-                attrs: { lang: "en" },
-                text: programme.episode.subGenre,
-              },
-              {
                 name: "series-id",
                 attrs: { system: "pluto" },
                 text: programme.episode.series._id,
-              },
-              {
-                name: "episode-num",
-                attrs: { system: "onscreen" },
-                text: episodeNumberString || programme.episode.number,
-              },
-              {
-                name: "episode-num",
-                attrs: { system: "pluto" },
-                text: programme.episode._id,
               },
               {
                 name: "episode-num",
@@ -509,11 +484,47 @@ ${m3uUrl}
             ],
           };
 
+          if (programme.episode.description && programme.episode.description != "No information available") {
+            airing.children.push({
+                name: "desc",
+                attrs: { lang: "en" },
+                text: programme.episode.description,
+            })
+          }
+          if (programme.episode.genre && programme.episode.genre != "No information available") {
+            airing.children.push({
+                name: "category",
+                attrs: { lang: "en" },
+                text: programme.episode.genre,
+            })
+          }
+          if (programme.episode.subGenre && programme.episode.subGenre != "No information available") {
+            airing.children.push({
+                name: "category",
+                attrs: { lang: "en" },
+                text: programme.episode.subGenre,
+            })
+          }
+          if (episodeNumberString || (programme.episode.number && programme.episode.number > 0 && !isMovie)) {
+            airing.children.push({
+                name: "episode-num",
+                attrs: { system: "onscreen" },
+                text: episodeNumberString || programme.episode.number,
+            })
+          }
+          if (!isMovie) {
+            airing.children.push({
+                name: "episode-num",
+                attrs: { system: "pluto" },
+                text: programme.episode._id,
+            })
+          }
+
           let uniqueGenres = channelsGenres.filter(function (item, pos) {
             return channelsGenres.indexOf(item) == pos;
           });
 
-          uniqueGenres.forEach((genre) => {
+          uniqueGenres.forEach(genre => {
             airing.children.push({
               name: "category",
               attrs: { lang: "en" },
