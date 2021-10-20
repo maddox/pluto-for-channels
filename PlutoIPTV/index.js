@@ -288,12 +288,11 @@ const plutoIPTV = {
       });
 
       fullChannels = Object.values(channelsList);
-      console.log("[DEBUG] Using api.pluto.tv, writing cache.json.");
-      fs.writeFileSync("cache.json", JSON.stringify(fullChannels));
-
       sortedChannels = fullChannels.sort(
         ({ number: a }, { number: b }) => a - b
       );
+      console.log("[DEBUG] Using api.pluto.tv, writing cache.json.");
+      fs.writeFileSync("cache.json", JSON.stringify(sortedChannels));
       callback(sortedChannels);
       return;
     });
