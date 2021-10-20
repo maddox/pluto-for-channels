@@ -479,13 +479,6 @@ ${m3uUrl}
                 attrs: { system: "pluto" },
                 text: programme.episode.series._id,
               },
-              {
-                name: "episode-num",
-                attrs: { system: "original-air-date" },
-                text: programme.episode.clip
-                  ? programme.episode.clip.originalReleaseDate
-                  : null,
-              },
             ],
           };
 
@@ -510,24 +503,37 @@ ${m3uUrl}
                 text: programme.episode.subGenre,
             })
           }
-          if (episodeNumberString && !isMovie) {
+          if (episodeNumberString && !isMovie && !isLive) {
             airing.children.push({
                 name: "episode-num",
                 attrs: { system: "onscreen" },
                 text: episodeNumberString,
             })
           }
-          if (!isMovie) {
+          if (!isMovie && !isLive) {
             airing.children.push({
                 name: "episode-num",
                 attrs: { system: "pluto" },
                 text: programme.episode._id,
             })
           }
+
+          let oad = programme.episode.clip ? programme.episode.clip.originalReleaseDate : null
           if (isLive) {
             airing.children.push({
               name: "live",
             })
+            airing.children.push({
+                name: "episode-num",
+                attrs: { system: "original-air-date" },
+                text:  moment(programme.start).format("YYYYMMDDHHmmss ZZ"),
+            })
+          } else if (oad) {
+            airing.children.push({
+              name: "episode-num",
+              attrs: { system: "original-air-date" },
+              text: oad,
+            });
           }
 
           let uniqueGenres = channelsGenres.filter(function (item, pos) {
