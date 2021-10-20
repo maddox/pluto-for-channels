@@ -420,6 +420,7 @@ ${m3uUrl}
           }
 
           let isMovie = programme.episode.series.type == "film";
+          let isLive = programme.episode.liveBroadcast === true
 
           let channelsGenres = [];
           let mogrifiedGenres = [...movieGenres, ...seriesGenres];
@@ -521,6 +522,11 @@ ${m3uUrl}
                 name: "episode-num",
                 attrs: { system: "pluto" },
                 text: programme.episode._id,
+            })
+          }
+          if (isLive) {
+            airing.children.push({
+              name: "live",
             })
           }
 
