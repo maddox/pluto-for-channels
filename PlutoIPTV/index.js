@@ -536,14 +536,12 @@ ${m3uUrl}
             });
           });
 
-          if (!isMovie) {
+          let subTitle = programme.title == programme.episode.name ? "" : programme.episode.name
+          if (!isMovie && subTitle) {
             airing.children.push({
               name: "sub-title",
               attrs: { lang: "en" },
-              text:
-                programme.title == programme.episode.name
-                  ? ""
-                  : programme.episode.name,
+              text: subTitle,
             });
           }
 
