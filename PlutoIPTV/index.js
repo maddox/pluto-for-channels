@@ -305,7 +305,17 @@ const plutoIPTV = {
 
 module.exports = plutoIPTV;
 
-function processChannels(version, channels) {
+function processChannels(version, list) {
+  let seenChannels = {};
+  let channels = [];
+  list.forEach(channel => {
+    if (seenChannels[channel.number]) {
+      return
+    }
+    seenChannels[channel.number] = true
+    channels.push(channel)
+  })
+
   ///////////////////
   // M3U8 Playlist //
   ///////////////////
