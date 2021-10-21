@@ -264,7 +264,11 @@ const plutoIPTV = {
       promises.push(
         new Promise((resolve, reject) => {
           request(url, function (err, code, raw) {
-            resolve(JSON.parse(raw));
+            if (err) {
+              reject(err);
+            } else {
+              resolve(JSON.parse(raw));
+            }
           });
         })
       );
