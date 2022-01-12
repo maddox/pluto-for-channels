@@ -195,7 +195,7 @@ const seriesGenres = [
       "Family Comedies",
     ],
   ],
-  [["Crime"], ["Crime Action", "Crime Drama"]],
+  [["Crime"], ["Crime Action", "Crime Drama", "Crime Documentaries"]],
   [["Crime drama"], ["Crime Drama"]],
   [
     ["Drama"],
