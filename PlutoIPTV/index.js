@@ -308,13 +308,13 @@ module.exports = plutoIPTV;
 function processChannels(version, list) {
   let seenChannels = {};
   let channels = [];
-  list.forEach(channel => {
+  list.forEach((channel) => {
     if (seenChannels[channel.number]) {
-      return
+      return;
     }
-    seenChannels[channel.number] = true
-    channels.push(channel)
-  })
+    seenChannels[channel.number] = true;
+    channels.push(channel);
+  });
 
   ///////////////////
   // M3U8 Playlist //
@@ -411,13 +411,10 @@ ${m3uUrl}
       //////////////
       // Episodes //
       //////////////
-      console.log("[INFO] Processing channel " + channel.name)
+      console.log("[INFO] Processing channel " + channel.name);
       if (channel.timelines) {
         channel.timelines.forEach((programme) => {
-          console.log(
-            "[INFO]     Adding instance of " +
-              programme.title
-          );
+          console.log("[INFO]     Adding instance of " + programme.title);
 
           let episodeParts = programme.episode.description.match(
             /\(([Ss](\d+)[Ee](\d+))\)/
@@ -425,14 +422,17 @@ ${m3uUrl}
           let episodeNumberString;
           if (episodeParts) {
             episodeNumberString = episodeParts[1];
-          } else if (programme.episode.season > 0 && programme.episode.number > 0) {
-            episodeNumberString = `S${programme.episode.season}E${programme.episode.number}`
+          } else if (
+            programme.episode.season > 0 &&
+            programme.episode.number > 0
+          ) {
+            episodeNumberString = `S${programme.episode.season}E${programme.episode.number}`;
           } else if (programme.episode.number > 0) {
-            episodeNumberString = `${programme.episode.number}`
+            episodeNumberString = `${programme.episode.number}`;
           }
 
           let isMovie = programme.episode.series.type == "film";
-          let isLive = programme.episode.liveBroadcast === true
+          let isLive = programme.episode.liveBroadcast === true;
 
           let channelsGenres = [];
           let mogrifiedGenres = [...movieGenres, ...seriesGenres];
@@ -494,52 +494,63 @@ ${m3uUrl}
             ],
           };
 
-          if (programme.episode.description && programme.episode.description != "No information available") {
+          if (
+            programme.episode.description &&
+            programme.episode.description != "No information available"
+          ) {
             airing.children.push({
-                name: "desc",
-                attrs: { lang: "en" },
-                text: programme.episode.description,
-            })
+              name: "desc",
+              attrs: { lang: "en" },
+              text: programme.episode.description,
+            });
           }
-          if (programme.episode.genre && programme.episode.genre != "No information available") {
+          if (
+            programme.episode.genre &&
+            programme.episode.genre != "No information available"
+          ) {
             airing.children.push({
-                name: "category",
-                attrs: { lang: "en" },
-                text: programme.episode.genre,
-            })
+              name: "category",
+              attrs: { lang: "en" },
+              text: programme.episode.genre,
+            });
           }
-          if (programme.episode.subGenre && programme.episode.subGenre != "No information available") {
+          if (
+            programme.episode.subGenre &&
+            programme.episode.subGenre != "No information available"
+          ) {
             airing.children.push({
-                name: "category",
-                attrs: { lang: "en" },
-                text: programme.episode.subGenre,
-            })
+              name: "category",
+              attrs: { lang: "en" },
+              text: programme.episode.subGenre,
+            });
           }
           if (episodeNumberString && !isMovie && !isLive) {
             airing.children.push({
-                name: "episode-num",
-                attrs: { system: "onscreen" },
-                text: episodeNumberString,
-            })
+              name: "episode-num",
+              attrs: { system: "onscreen" },
+              text: episodeNumberString,
+            });
           }
           if (!isMovie && !isLive) {
             airing.children.push({
-                name: "episode-num",
-                attrs: { system: "pluto" },
-                text: programme.episode._id,
-            })
+              name: "episode-num",
+              attrs: { system: "pluto" },
+              text: programme.episode._id,
+            });
           }
 
-          let oad = programme.episode.clip ? programme.episode.clip.originalReleaseDate : null
+          let oad = programme.episode.clip
+            ? programme.episode.clip.originalReleaseDate
+            : null;
           if (isLive) {
             airing.children.push({
               name: "live",
-            })
+            });
             airing.children.push({
-                name: "episode-num",
-                attrs: { system: "original-air-date" },
-                text:  moment(programme.start).format("YYYYMMDDHHmmss ZZ"),
-            })
+              name: "episode-num",
+              attrs: { system: "original-air-date" },
+              text: moment(programme.start).format("YYYYMMDDHHmmss ZZ"),
+            });
           } else if (oad) {
             airing.children.push({
               name: "episode-num",
@@ -552,7 +563,7 @@ ${m3uUrl}
             return channelsGenres.indexOf(item) == pos;
           });
 
-          uniqueGenres.forEach(genre => {
+          uniqueGenres.forEach((genre) => {
             airing.children.push({
               name: "category",
               attrs: { lang: "en" },
@@ -560,7 +571,10 @@ ${m3uUrl}
             });
           });
 
-          let subTitle = programme.title == programme.episode.name ? "" : programme.episode.name
+          let subTitle =
+            programme.title == programme.episode.name
+              ? ""
+              : programme.episode.name;
           if (!isMovie && subTitle) {
             airing.children.push({
               name: "sub-title",
