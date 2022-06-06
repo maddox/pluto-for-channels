@@ -258,7 +258,7 @@ const plutoIPTV = {
         timeRange[1].format("YYYY-MM-DD HH:00:00.000ZZ")
       );
 
-      let url = `http://api.pluto.tv/v2/channels?start=${startTime}&stop=${stopTime}`;
+      let url = `https://api.pluto.tv/v2/channels?start=${startTime}&stop=${stopTime}`;
       console.log(url);
 
       promises.push(
