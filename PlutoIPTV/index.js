@@ -8,7 +8,7 @@ const uuid4 = require("uuid").v4;
 const uuid1 = require("uuid").v1;
 const url = require("url");
 
-const conflictingChannels = ["cnn"];
+const conflictingChannels = ["cnn", "dabl"];
 
 const kidsGenres = [
   "Kids",
