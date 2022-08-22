@@ -12,7 +12,8 @@ const conflictingChannels = [
   "cnn",
   "dabl",
   "heartland",
-  "newsy"
+  "newsy",
+  "buzzr"
 ];
 
 const kidsGenres = [
