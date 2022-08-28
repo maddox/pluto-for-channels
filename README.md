@@ -29,6 +29,14 @@ Simpley provide a comma separated list of words without spaces with the `VERSION
 By using the `EXCLUDE_CATEGORIES` environment variable when starting the docker container,
 you can tell it to exclude channel categories from the .m3u
 
+Provide a comma separated list of categories:
+
+    EXCLUDE_CATEGORIES=Kids,En Español,Music,Gaming + Anime
+
+If running via docker on the command line:
+
+    docker run -d --restart unless-stopped --name pluto-for-channels -p 8080:80 -e "EXCLUDE_CATEGORIES=Kids,En Español,Music,Gaming + Anime" jonmaddox/pluto-for-channels
+
 
 ## Add Source to Channels
 
