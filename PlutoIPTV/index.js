@@ -221,6 +221,11 @@ if (process.argv[2]) {
   versions = versions.concat(process.argv[2].split(","));
 }
 
+let excludedCategories = []
+if (process.env.EXCLUDE_CATEGORIES) {
+  excludedCategories = process.env.EXCLUDE_CATEGORIES.split(",")
+}
+
 const plutoIPTV = {
   grabJSON: function (callback) {
     callback = callback || function () {};
@@ -330,7 +335,10 @@ function processChannels(version, list) {
   channels.forEach((channel) => {
     let deviceId = uuid1();
     let sid = uuid4();
-    if (
+
+    if (excludedCategories.includes(channel.category)) {
+      console.log(`[DEBUG] Skipping channel ${channel.name} from excluded category '${channel.category}'`);
+    } else if (
       channel.isStitched &&
       !channel.slug.match(/^announcement|^privacy-policy/)
     ) {
@@ -380,9 +388,9 @@ function processChannels(version, list) {
 ${m3uUrl}
 
 `;
-      console.log("[INFO] Adding " + channel.name + " channel.");
+      console.log("[INFO] Adding " + channel.name + " channel");
     } else {
-      console.log("[DEBUG] Skipping 'fake' channel " + channel.name + ".");
+      console.log("[DEBUG] Skipping 'fake' channel " + channel.name);
     }
   });
 

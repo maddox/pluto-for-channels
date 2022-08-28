@@ -24,6 +24,11 @@ Simpley provide a comma separated list of words without spaces with the `VERSION
 
     docker run -d --restart unless-stopped --name pluto-for-channels -p 8080:80 -e VERSIONS=Dad,Bob,Joe jonmaddox/pluto-for-channels
 
+### Optionally exclude channel categories
+
+By using the `EXCLUDE_CATEGORIES` environment variable when starting the docker container,
+you can tell it to exclude channel categories from the .m3u
+
 
 ## Add Source to Channels
 
