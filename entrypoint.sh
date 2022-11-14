@@ -14,7 +14,7 @@ get_latest_release() {
 
 while :
 do
-  node index.js $VERSIONS
+  START=$START node index.js $VERSIONS
 
   CURRENT_VERSION=`cat VERSION`
   LATEST_VERSION=`get_latest_release`
