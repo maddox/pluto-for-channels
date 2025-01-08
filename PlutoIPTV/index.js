@@ -246,6 +246,30 @@ const plutoIPTV = {
 
     let startMoment = moment();
 
+    const MAX_RETRIES = 3;
+    const RETRY_DELAY = 60000; // 1 minute
+
+    function requestWithRetry(url, retries = MAX_RETRIES) {
+      return new Promise((resolve, reject) => {
+        function attempt() {
+          request(url, function (err, code, raw) {
+            if (err) {
+              if (retries > 0 && err.code === 'ETIMEDOUT') {
+                console.log(`Retrying request... (${MAX_RETRIES - retries + 1})`);
+                setTimeout(attempt, RETRY_DELAY);
+                retries--;
+              } else {
+                reject(err);
+              }
+            } else {
+              resolve(JSON.parse(raw));
+            }
+          });
+        }
+        attempt();
+      });
+    }
+
     let timeRanges = [];
     for (let i = 0; i < 4; i++) {
       let endMoment = moment(startMoment).add(6, "hours");
@@ -268,17 +292,7 @@ const plutoIPTV = {
       let url = `https://api.pluto.tv/v2/channels?start=${startTime}&stop=${stopTime}`;
       console.log(url);
 
-      promises.push(
-        new Promise((resolve, reject) => {
-          request(url, function (err, code, raw) {
-            if (err) {
-              reject(err);
-            } else {
-              resolve(JSON.parse(raw));
-            }
-          });
-        })
-      );
+      promises.push(requestWithRetry(url));
     });
 
     let channelsList = {};
@@ -306,6 +320,10 @@ const plutoIPTV = {
       fs.writeFileSync("cache.json", JSON.stringify(sortedChannels));
       callback(sortedChannels);
       return;
+    })
+    .catch((err) => {
+      console.error(err);
+      process.exit(1);
     });
   },
 };
