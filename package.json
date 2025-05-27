@@ -1,0 +1,53 @@
+{
+  "name": "pluto-iptv",
+  "version": "2.0.0",
+  "description": "Pluto TV to XMLTV & M3U converter with web server",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "server": "node index.js --server",
+    "dev": "DEBUG=true nodemon index.js --server",
+    "docker:build": "docker build -t pluto-iptv .",
+    "docker:run": "docker run -d -p 8080:8080 --name pluto-iptv pluto-iptv",
+    "test": "jest",
+    "lint": "eslint ."
+  },
+  "bin": {
+    "pluto-iptv": "./index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/evoactivity/PlutoIPTV.git"
+  },
+  "keywords": [
+    "pluto",
+    "iptv",
+    "m3u",
+    "xmltv",
+    "epg",
+    "channels-dvr"
+  ],
+  "author": "Liam Potter <liam@liampotter.co.uk>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/evoactivity/PlutoIPTV/issues"
+  },
+  "homepage": "https://github.com/evoactivity/PlutoIPTV#readme",
+  "dependencies": {
+    "axios": "^1.6.0",
+    "chalk": "^4.1.2",
+    "express": "^4.18.2",
+    "fs-extra": "^11.1.1",
+    "jsontoxml": "^1.0.1",
+    "moment": "^2.29.4",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.50.0",
+    "jest": "^29.7.0",
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
