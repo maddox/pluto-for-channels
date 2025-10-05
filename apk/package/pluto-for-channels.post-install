@@ -1,0 +1,9 @@
+#!/bin/sh
+
+cd /usr/src/app
+yarn --production --no-progress
+rm -rf /tmp/*
+
+cp nginx.conf /etc/nginx/http.d/default.conf
+
+exit 0

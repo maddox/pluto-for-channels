@@ -1,0 +1,22 @@
+#!/sbin/openrc-run
+
+name="pluto-for-channels"
+command="/usr/src/app/entrypoint.sh"
+command_user="root:root"
+pidfile="/run/$RC_SVCNAME.pid"
+command_background="yes"
+output_log="/var/log/pluto.log"
+error_log="/var/log/pluto.err"
+start_stop_daemon_args="--env START_NGINX=NO --env NGINX_ROOT=/var/www/html"
+
+if [ "${VERSION}" != "" ]; then
+start_stop_daemon_args="${start_stop_daemon_args} --env VERSION=${VERSION}"
+fi
+if [ "${START}" != "" ]; then
+start_stop_daemon_args="${start_stop_daemon_args} --env START=${START}"
+fi
+
+depend() {
+    need net
+    use dns
+}

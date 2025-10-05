@@ -1,0 +1,8 @@
+#!/bin/sh
+
+rm -rf /var/log/pluto.err /var/log/pluto.log
+
+cd /usr/src/app
+rm -rf node_modules cache.json cache.json epg.xml
+
+exit 0

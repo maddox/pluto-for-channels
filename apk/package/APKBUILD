@@ -1,0 +1,43 @@
+pkgname=pluto-for-channels
+pkgver=1.2.15
+pkgrel=0
+pkgdesc="Pluto for Channels"
+url="https://github.com/maddox/pluto-for-channels"
+license="MIT"
+depends="nginx libuv nodejs-current npm yarn curl"
+depends_dev=""
+makedepends="$depends_dev"
+install="pluto-for-channels.post-install pluto-for-channels.pre-deinstall"
+arch=noarch
+
+subpackages="$pkgname-openrc"
+depends_openrc="pluto-for-channels"
+
+prepare() {
+    default_prepare
+
+	mkdir -p "$srcdir/$pkgname-$pkgver"
+    cp -r "$startdir/VERSION" "$srcdir/$pkgname-$pkgver"
+    cp -r "$startdir/entrypoint.sh" "$srcdir/$pkgname-$pkgver"
+    cp -r "$startdir/index.html" "$srcdir/$pkgname-$pkgver"
+    cp -r "$startdir/PlutoIPTV/"* "$srcdir/$pkgname-$pkgver"
+}
+
+package() {
+    cd "$builddir"
+    install -Dm755 /dev/null "$pkgdir"/etc/$pkgname/config.json
+
+    # copy app into /usr/share
+    install -dm755 "$pkgdir"/usr/src/app
+    cp -r . "$pkgdir"/usr/src/app
+	install -m644 "$startdir"/nginx.conf "$pkgdir"/usr/src/app
+	install -m755 "$startdir"/enable "$pkgdir"/usr/src/app
+	install -m755 "$startdir"/disable "$pkgdir"/usr/src/app
+
+    install -dm755 "$pkgdir"/var/www/html
+
+    
+    # init scripts
+    install -Dm755 "$startdir"/pluto.initd "$pkgdir"/etc/init.d/$pkgname
+    install -Dm644 "$startdir"/pluto.confd "$pkgdir"/etc/conf.d/$pkgname
+}

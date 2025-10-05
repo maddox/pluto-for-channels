@@ -1,0 +1,7 @@
+#!/bin/sh
+
+rc-update add nginx
+rc-update add pluto-for-channels
+
+rc-service nginx start
+rc-service pluto-for-channels start

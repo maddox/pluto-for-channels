@@ -1,0 +1,13 @@
+#!/bin/sh
+
+if [ ! -f VERSION ]; then
+  echo "Not building from the root of the git repo"
+  exit -1
+fi 
+
+rm -rf apk/outputs
+
+docker build --no-cache -f apk/Dockerfile -t pluto-for-channels-builder ${PWD}
+docker create --name builder pluto-for-channels-builder
+docker cp builder:/output ./apk/outputs
+docker rm builder

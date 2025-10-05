@@ -2,9 +2,18 @@
 
 cd /usr/src/app
 
+if [ ${START_NGINX=YES} == "YES" ]; then
 nginx
+fi
 
+if [ ${NGINX_ROOT} == "" ]; then
 NGINX_ROOT=/usr/share/nginx/html
+fi
+
+if [ ! -d ${NGINX_ROOT} ]; then
+  echo "${NGINX_ROOT} is not a directory"
+  exit 1
+fi
 
 get_latest_release() {
   curl --silent "https://api.github.com/repos/maddox/pluto-for-channels/releases/latest" |

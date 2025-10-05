@@ -51,3 +51,41 @@ Next, set the provider for your new source and choose custom URL.
 Finally, enter your EPG xml url and set it to refresh every 6 hours.
 
 <img src=".github/3.png" width="500px"/>
+
+## Alpine Linux Package
+
+For those of you who use LXC Containers without Docker, there also is an option to generate an untrusted APK file for install to as many containers as needed.  Here are the steps:
+
+1. Clone the git repo locally
+2. cd [root of the git repo]
+3. Run build script (this will run Docker to generate the APK)
+```
+apk/build
+```
+4. copy the 2 APKs from apk/outputs to your LXC container
+```
+# ls -la apk/outputs/src/aarch64/*.apk
+apk/outputs//src/aarch64/pluto-for-channels-1.2.15-r0.apk		apk/outputs//src/aarch64/pluto-for-channels-openrc-1.2.15-r0.apk
+# scp apk/outputs/src/aarch64/*.apk user@lxc-container:
+```
+5. Login to the LXC Container
+6. Install the APKs
+```
+# apk add --allow-untrusted ./pluto-for-channels-1.2.15-r0.apk ./pluto-for-channels-openrc-1.2.15-r0.apk
+```
+7. Customize as you see fit, Environment variables for the daemon are in /etc/conf.d/pluto-for-channels
+8. Enable the service
+```
+/usr/src/app/enable
+```
+
+### If you want to uninstall, do the following:
+
+1. Disable the service
+```
+/usr/src/app/disable
+```
+2. Uninstall the packges:
+```
+# apk del pluto-for-channels pluto-for-channels-openrc
+```

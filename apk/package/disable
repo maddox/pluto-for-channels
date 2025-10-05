@@ -1,0 +1,7 @@
+#!/bin/sh
+
+rc-service pluto-for-channels stop
+rc-service nginx stop
+
+rc-update del pluto-for-channels
+rc-update del nginx
