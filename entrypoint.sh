@@ -14,7 +14,7 @@ get_latest_release() {
 
 while :
 do
-  START=$START node index.js $VERSIONS
+  PLUTO_USERNAME=$PLUTO_USERNAME PLUTO_PASSWORD=$PLUTO_PASSWORD START=$START node index.js $VERSIONS
 
   CURRENT_VERSION=`cat VERSION`
   LATEST_VERSION=`get_latest_release`
