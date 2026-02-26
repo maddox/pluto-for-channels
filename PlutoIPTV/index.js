@@ -8,6 +8,65 @@ const uuid4 = require("uuid").v4;
 const uuid1 = require("uuid").v1;
 const url = require("url");
 
+// Authentication data stored after calling authenticate()
+let authData = null;
+
+// Authenticate with Pluto TV to get session token and stitcher params
+function authenticate() {
+  return new Promise((resolve, reject) => {
+    // Validate required credentials
+    if (!process.env.PLUTO_USERNAME || !process.env.PLUTO_PASSWORD) {
+      reject(new Error('PLUTO_USERNAME and PLUTO_PASSWORD environment variables are required'));
+      return;
+    }
+
+    const deviceId = uuid1();
+    const bootParams = new URLSearchParams({
+      appName: 'web',
+      appVersion: '8.0.0-111b2b9dc00bd0bea9030b30662159ed9e7c8bc6',
+      deviceVersion: '122.0.0',
+      deviceModel: 'web',
+      deviceMake: 'chrome',
+      deviceType: 'web',
+      clientID: deviceId,
+      clientModelNumber: '1.0.0',
+      serverSideAds: 'false',
+      drmCapabilities: 'widevine:L3',
+      username: process.env.PLUTO_USERNAME,
+      password: process.env.PLUTO_PASSWORD,
+    });
+
+    const bootUrl = `https://boot.pluto.tv/v4/start?${bootParams.toString()}`;
+    console.log('[INFO] Authenticating with Pluto TV...');
+
+    request(bootUrl, function (err, response, body) {
+      if (err) {
+        reject(new Error(`Authentication request failed: ${err.message}`));
+        return;
+      }
+
+      try {
+        const data = JSON.parse(body);
+
+        if (!data.sessionToken) {
+          reject(new Error('Authentication failed: No session token in response'));
+          return;
+        }
+
+        authData = {
+          sessionToken: data.sessionToken,
+          stitcherParams: data.stitcherParams || '',
+        };
+
+        console.log('[INFO] Authentication successful');
+        resolve(authData);
+      } catch (parseErr) {
+        reject(new Error(`Failed to parse authentication response: ${parseErr.message}`));
+      }
+    });
+  });
+}
+
 const conflictingChannels = [
   "cnn",
   "dabl",
@@ -347,37 +406,13 @@ function processChannels(version, list) {
 
   let m3u8 = "#EXTM3U\n\n";
   channels.forEach((channel) => {
-    let deviceId = uuid1();
-    let sid = uuid4();
     if (
       channel.isStitched &&
       !channel.slug.match(/^announcement|^privacy-policy/)
     ) {
-      let m3uUrl = new URL(channel.stitched.urls[0].url);
-      let queryString = url.search;
-      let params = new URLSearchParams(queryString);
-
-      // set the url params
-      params.set("advertisingId", "");
-      params.set("appName", "web");
-      params.set("appVersion", "unknown");
-      params.set("appStoreUrl", "");
-      params.set("architecture", "");
-      params.set("buildVersion", "");
-      params.set("clientTime", "0");
-      params.set("deviceDNT", "0");
-      params.set("deviceId", deviceId);
-      params.set("deviceMake", "Chrome");
-      params.set("deviceModel", "web");
-      params.set("deviceType", "web");
-      params.set("deviceVersion", "unknown");
-      params.set("includeExtendedEvents", "false");
-      params.set("sid", sid);
-      params.set("userId", "");
-      params.set("serverSideAds", "true");
-
-      m3uUrl.search = params.toString();
-      m3uUrl = m3uUrl.toString();
+      // Construct authenticated stream URL
+      const stitcher = "https://cfd-v4-service-channel-stitcher-use1-1.prd.pluto.tv";
+      let m3uUrl = `${stitcher}/v2/stitch/hls/channel/${channel._id}/master.m3u8?${authData.stitcherParams}&jwt=${authData.sessionToken}&masterJWTPassthrough=true&includeExtendedEvents=true`;
 
       let slug = conflictingChannels.includes(channel.slug)
         ? `pluto-${channel.slug}`
@@ -634,8 +669,16 @@ ${m3uUrl}
   console.log(`[SUCCESS] Wrote the M3U8 tuner to ${playlistFileName}!`);
 }
 
-versions.forEach((version) => {
-  plutoIPTV.grabJSON(function (channels) {
-    processChannels(version, channels);
+// Main execution - authenticate first, then process channels
+authenticate()
+  .then(() => {
+    versions.forEach((version) => {
+      plutoIPTV.grabJSON(function (channels) {
+        processChannels(version, channels);
+      });
+    });
+  })
+  .catch((err) => {
+    console.error('[ERROR] ' + err.message);
+    process.exit(1);
   });
-});
