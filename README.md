@@ -8,9 +8,21 @@ This simple Docker image will generate an M3U playlist and EPG optimized for use
 
 ## Set Up
 
-Running the container is easy. Fire up the container as usual. You can set which port it runs on.
+Pluto TV now requires authentication for streams to work. You'll need a free Pluto TV account.
 
-    docker run -d --restart unless-stopped --name pluto-for-channels -p 8080:80 jonmaddox/pluto-for-channels
+### Required: Authentication
+
+You must provide your Pluto TV credentials via environment variables:
+
+- `PLUTO_USERNAME` - Your Pluto TV account email
+- `PLUTO_PASSWORD` - Your Pluto TV account password
+
+Running the container:
+
+    docker run -d --restart unless-stopped --name pluto-for-channels -p 8080:80 \
+      -e PLUTO_USERNAME='your@email.com' \
+      -e PLUTO_PASSWORD='yourpassword' \
+      jonmaddox/pluto-for-channels
 
 You can retrieve the playlist and EPG via the status page.
 
@@ -22,7 +34,11 @@ By using the `VERSIONS` env var when starting the docker container, you can tell
 
 Simply provide a comma separated list of words without spaces with the `VERSIONS` env var.
 
-    docker run -d --restart unless-stopped --name pluto-for-channels -p 8080:80 -e VERSIONS=Dad,Bob,Joe jonmaddox/pluto-for-channels
+    docker run -d --restart unless-stopped --name pluto-for-channels -p 8080:80 \
+      -e PLUTO_USERNAME='your@email.com' \
+      -e PLUTO_PASSWORD='yourpassword' \
+      -e VERSIONS=Dad,Bob,Joe \
+      jonmaddox/pluto-for-channels
 
 ### Optionally provide a starting channel number
 
@@ -32,9 +48,13 @@ You should use a starting number greater than 10000, so that the channel numbers
 
 For example, channel 345 will be 10345. Channel 2102 will be 12102.
 
-Simpley provide a starting number with the `START` env var.
+Simply provide a starting number with the `START` env var.
 
-    docker run -d --restart unless-stopped --name pluto-for-channels -p 8080:80 -e START=80000 jonmaddox/pluto-for-channels
+    docker run -d --restart unless-stopped --name pluto-for-channels -p 8080:80 \
+      -e PLUTO_USERNAME='your@email.com' \
+      -e PLUTO_PASSWORD='yourpassword' \
+      -e START=80000 \
+      jonmaddox/pluto-for-channels
 
 ## Add Source to Channels
 
