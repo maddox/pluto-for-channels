@@ -278,8 +278,8 @@ const seriesGenres = [
 // Default START to 10000 for consistent channel numbers across tuners (important for Channels DVR failover)
 const start = parseInt(process.env.START || 10000);
 
-// Parse tuner count from env or CLI arg
-const tunerCount = parseInt(process.env.TUNERS || process.argv[2] || 1);
+// Fixed 12 tuners for concurrent streaming
+const tunerCount = 12;
 const tuners = Array.from({ length: tunerCount }, (_, i) => `tuner-${i + 1}`);
 
 const plutoIPTV = {
