@@ -2,13 +2,13 @@
 
 This simple Docker image will generate an M3U playlist and EPG optimized for use in [Channels](https://getchannels.com) and expose them over HTTP.
 
-[Channels](https://getchannels.com) supports [custom channels](https://getchannels.com/docs/channels-dvr-server/how-to/custom-channels/) by utilizing streaming sources via M3U playlists.
+The [Custom Channels](https://getchannels.com/custom-channels/) feature in [Channels](https://getchannels.com) utilizes existing streaming sources to make them live TV channels in the app.
 
 [Channels](https://getchannels.com) allows for [additional extended metadata tags](https://getchannels.com/docs/channels-dvr-server/how-to/custom-channels/#channels-extensions) in M3U playlists that allow you to give it extra information and art to make the experience better. This project adds those extra tags to make things look great in Channels.
 
 ## Set Up
 
-Pluto TV now requires authentication for streams to work. You'll need a free Pluto TV account.
+Pluto TV requires authentication for streams to work. You'll need a free Pluto TV account.
 
 ### Required: Authentication
 
@@ -24,7 +24,7 @@ Running the container:
       -e PLUTO_PASSWORD='yourpassword' \
       jonmaddox/pluto-for-channels
 
-You can retrieve the playlist and EPG via the status page.
+Visit the status page to get access to your M3U playlists and EPG XML.
 
     http://127.0.0.1:8080
 
