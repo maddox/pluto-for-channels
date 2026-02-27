@@ -411,11 +411,26 @@
     </footer>
   </div>
   <script>
+    function copyToClipboard(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        return navigator.clipboard.writeText(text);
+      }
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+      return Promise.resolve();
+    }
+
     document.querySelectorAll('.tuner-card').forEach(card => {
       card.addEventListener('click', async (e) => {
         e.preventDefault();
         const url = window.location.origin + card.getAttribute('href');
-        await navigator.clipboard.writeText(url);
+        await copyToClipboard(url);
 
         const fileEl = card.querySelector('.tuner-file');
         const originalText = fileEl.textContent;
@@ -434,7 +449,7 @@
       e.preventDefault();
       const btn = e.currentTarget;
       const url = window.location.origin + btn.getAttribute('href');
-      await navigator.clipboard.writeText(url);
+      await copyToClipboard(url);
 
       const textEl = btn.querySelector('span');
       const originalText = textEl.textContent;
