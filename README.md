@@ -28,27 +28,23 @@ You can retrieve the playlist and EPG via the status page.
 
     http://127.0.0.1:8080
 
-### Optionally have multiple feeds generated
+### Multiple Tuners for Concurrent Streams
 
-By using the `VERSIONS` env var when starting the docker container, you can tell it to create multiple feeds that can be used elsewhere.
-
-Simply provide a comma separated list of words without spaces with the `VERSIONS` env var.
+By using the `TUNERS` env var, you can enable concurrent streaming. Add each tuner playlist as a separate source in Channels DVR Server and set the Stream Limit to 1.
 
     docker run -d --restart unless-stopped --name pluto-for-channels -p 8080:80 \
       -e PLUTO_USERNAME='your@email.com' \
       -e PLUTO_PASSWORD='yourpassword' \
-      -e VERSIONS=Dad,Bob,Joe \
+      -e TUNERS=4 \
       jonmaddox/pluto-for-channels
 
 ### Optionally provide a starting channel number
 
 By using the `START` env var when starting the docker container, you can tell it to start channel numbers with this value. Original Pluto channel numbers will be added to this, keeping all of the channels in the same order they are on Pluto.
 
-You should use a starting number greater than 10000, so that the channel numbers will be preserved but not conflict with any other channels you may have.
+**Default:** 10000 (channel 345 becomes 10345). This ensures consistent channel numbers across all tuners for proper Channels DVR Server failover.
 
-For example, channel 345 will be 10345. Channel 2102 will be 12102.
-
-Simply provide a starting number with the `START` env var.
+To use a custom starting number:
 
     docker run -d --restart unless-stopped --name pluto-for-channels -p 8080:80 \
       -e PLUTO_USERNAME='your@email.com' \
@@ -60,7 +56,20 @@ Simply provide a starting number with the `START` env var.
 
 Once you have your Pluto M3U and EPG XML available, you can use it to [custom channels](https://getchannels.com/docs/channels-dvr-server/how-to/custom-channels/) channels in the [Channels](https://getchannels.com) app.
 
-Add a new source in Channels DVR Server and choose `M3U Playlist`. Fill out the form using your new playlist URL.
+### Single Tuner Setup
+
+Add a new source in Channels DVR Server and choose `M3U Playlist`. Fill out the form using your tuner-1-playlist.m3u URL.
+
+### Multi-Tuner Setup (Recommended for concurrent streams)
+
+1. Set `TUNERS=N` where N is your desired concurrent stream count (e.g., `TUNERS=4`)
+2. Add each tuner playlist as a separate Custom Channels source:
+   - Source 1: `http://your-server:8080/tuner-1-playlist.m3u`
+   - Source 2: `http://your-server:8080/tuner-2-playlist.m3u`
+   - etc.
+3. Set the **Stream Limit** dropdown to **1** for each source
+4. Use the same EPG URL (`http://your-server:8080/epg.xml`) for all sources
+5. Channels DVR Server will automatically coordinate between tuners and failover as needed
 
 <img src=".github/1.png" width="400px"/>
 
