@@ -28,16 +28,6 @@ You can retrieve the playlist and EPG via the status page.
 
     http://127.0.0.1:8080
 
-### Multiple Tuners for Concurrent Streams
-
-By using the `TUNERS` env var, you can enable concurrent streaming. Add each tuner playlist as a separate source in Channels DVR Server and set the Stream Limit to 1.
-
-    docker run -d --restart unless-stopped --name pluto-for-channels -p 8080:80 \
-      -e PLUTO_USERNAME='your@email.com' \
-      -e PLUTO_PASSWORD='yourpassword' \
-      -e TUNERS=4 \
-      jonmaddox/pluto-for-channels
-
 ### Optionally provide a starting channel number
 
 By using the `START` env var when starting the docker container, you can tell it to start channel numbers with this value. Original Pluto channel numbers will be added to this, keeping all of the channels in the same order they are on Pluto.
@@ -56,20 +46,15 @@ To use a custom starting number:
 
 Once you have your Pluto M3U and EPG XML available, you can use it to [custom channels](https://getchannels.com/docs/channels-dvr-server/how-to/custom-channels/) channels in the [Channels](https://getchannels.com) app.
 
-### Single Tuner Setup
+12 tuners are available for concurrent streaming. Add as many as you need:
 
-Add a new source in Channels DVR Server and choose `M3U Playlist`. Fill out the form using your tuner-1-playlist.m3u URL.
-
-### Multi-Tuner Setup (Recommended for concurrent streams)
-
-1. Set `TUNERS=N` where N is your desired concurrent stream count (e.g., `TUNERS=4`)
-2. Add each tuner playlist as a separate Custom Channels source:
+1. Add tuner playlists as separate Custom Channels sources:
    - Source 1: `http://your-server:8080/tuner-1-playlist.m3u`
    - Source 2: `http://your-server:8080/tuner-2-playlist.m3u`
-   - etc.
-3. Set the **Stream Limit** dropdown to **1** for each source
-4. Use the same EPG URL (`http://your-server:8080/epg.xml`) for all sources
-5. Channels DVR Server will automatically coordinate between tuners and failover as needed
+   - ... up to tuner-12
+2. Set the **Stream Limit** dropdown to **1** for each source
+3. Use the same EPG URL (`http://your-server:8080/epg.xml`) for all sources
+4. Channels DVR Server will automatically coordinate between tuners and failover as needed
 
 <img src=".github/1.png" width="400px"/>
 
