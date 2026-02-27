@@ -5,14 +5,13 @@ const j2x = require("jsontoxml");
 const moment = require("moment");
 const fs = require("fs-extra");
 const uuid4 = require("uuid").v4;
-const uuid1 = require("uuid").v1;
-const url = require("url");
 
-// Authentication data stored after calling authenticate()
-let authData = null;
+// Authentication sessions stored per tuner
+const authSessions = new Map(); // tunerName -> { sessionToken, stitcherParams, deviceId }
 
 // Authenticate with Pluto TV to get session token and stitcher params
-function authenticate() {
+// Each tuner gets its own unique session with a different deviceId
+function authenticate(tunerName) {
   return new Promise((resolve, reject) => {
     // Validate required credentials
     if (!process.env.PLUTO_USERNAME || !process.env.PLUTO_PASSWORD) {
@@ -20,7 +19,8 @@ function authenticate() {
       return;
     }
 
-    const deviceId = uuid1();
+    // Generate unique deviceId per tuner for independent sessions
+    const deviceId = uuid4();
     const bootParams = new URLSearchParams({
       appName: 'web',
       appVersion: '8.0.0-111b2b9dc00bd0bea9030b30662159ed9e7c8bc6',
@@ -37,7 +37,7 @@ function authenticate() {
     });
 
     const bootUrl = `https://boot.pluto.tv/v4/start?${bootParams.toString()}`;
-    console.log('[INFO] Authenticating with Pluto TV...');
+    console.log(`[INFO] Authenticating ${tunerName} with Pluto TV (deviceId: ${deviceId.substring(0, 8)}...)...`);
 
     request(bootUrl, function (err, response, body) {
       if (err) {
@@ -53,12 +53,13 @@ function authenticate() {
           return;
         }
 
-        authData = {
+        const authData = {
           sessionToken: data.sessionToken,
           stitcherParams: data.stitcherParams || '',
+          deviceId: deviceId,
         };
 
-        console.log('[INFO] Authentication successful');
+        console.log(`[INFO] ${tunerName} authentication successful`);
         resolve(authData);
       } catch (parseErr) {
         reject(new Error(`Failed to parse authentication response: ${parseErr.message}`));
@@ -274,122 +275,120 @@ const seriesGenres = [
   ],
 ];
 
-versions = ["main"];
-start = parseInt(process.env.START || 0);
+// Default START to 10000 for consistent channel numbers across tuners (important for Channels DVR failover)
+const start = parseInt(process.env.START || 10000);
 
-if (process.argv[2]) {
-  versions = versions.concat(process.argv[2].split(","));
-}
+// Parse tuner count from env or CLI arg
+const tunerCount = parseInt(process.env.TUNERS || process.argv[2] || 1);
+const tuners = Array.from({ length: tunerCount }, (_, i) => `tuner-${i + 1}`);
 
 const plutoIPTV = {
-  grabJSON: function (callback) {
-    callback = callback || function () {};
+  grabJSON: function () {
+    return new Promise((resolve, reject) => {
+      console.log("[INFO] Grabbing EPG...");
 
-    console.log("[INFO] Grabbing EPG...");
+      // check for cache
+      if (fs.existsSync("cache.json")) {
+        let stat = fs.statSync("cache.json");
 
-    // check for cache
-    if (fs.existsSync("cache.json")) {
-      let stat = fs.statSync("cache.json");
+        let now = new Date() / 1000;
+        let mtime = new Date(stat.mtime) / 1000;
 
-      let now = new Date() / 1000;
-      let mtime = new Date(stat.mtime) / 1000;
-
-      // it's under 30 mins old
-      if (now - mtime <= 1800) {
-        console.log("[DEBUG] Using cache.json, it's under 30 minutes old.");
-
-        callback(fs.readJSONSync("cache.json"));
-        return;
+        // it's under 30 mins old
+        if (now - mtime <= 1800) {
+          console.log("[DEBUG] Using cache.json, it's under 30 minutes old.");
+          resolve(fs.readJSONSync("cache.json"));
+          return;
+        }
       }
-    }
 
-    let startMoment = moment();
+      let startMoment = moment();
 
-    const MAX_RETRIES = 3;
-    const RETRY_DELAY = 60000; // 1 minute
+      const MAX_RETRIES = 3;
+      const RETRY_DELAY = 60000; // 1 minute
 
-    function requestWithRetry(url, retries = MAX_RETRIES) {
-      return new Promise((resolve, reject) => {
-        function attempt() {
-          request(url, function (err, code, raw) {
-            if (err) {
-              if (retries > 0 && err.code === 'ETIMEDOUT') {
-                console.log(`Retrying request... (${MAX_RETRIES - retries + 1})`);
-                setTimeout(attempt, RETRY_DELAY);
-                retries--;
+      function requestWithRetry(url, retries = MAX_RETRIES) {
+        return new Promise((resolve, reject) => {
+          function attempt() {
+            request(url, function (err, code, raw) {
+              if (err) {
+                if (retries > 0 && err.code === 'ETIMEDOUT') {
+                  console.log(`Retrying request... (${MAX_RETRIES - retries + 1})`);
+                  setTimeout(attempt, RETRY_DELAY);
+                  retries--;
+                } else {
+                  reject(err);
+                }
               } else {
-                reject(err);
+                resolve(JSON.parse(raw));
               }
+            });
+          }
+          attempt();
+        });
+      }
+
+      let timeRanges = [];
+      for (let i = 0; i < 4; i++) {
+        let endMoment = moment(startMoment).add(6, "hours");
+        timeRanges.push([startMoment, endMoment]);
+        startMoment = endMoment;
+      }
+
+      let promises = [];
+      timeRanges.forEach((timeRange) => {
+        // 2020-03-24%2021%3A00%3A00.000%2B0000
+        let startTime = encodeURIComponent(
+          timeRange[0].format("YYYY-MM-DD HH:00:00.000ZZ")
+        );
+
+        // 2020-03-25%2005%3A00%3A00.000%2B0000
+        let stopTime = encodeURIComponent(
+          timeRange[1].format("YYYY-MM-DD HH:00:00.000ZZ")
+        );
+
+        let url = `https://api.pluto.tv/v2/channels?start=${startTime}&stop=${stopTime}`;
+        console.log(url);
+
+        promises.push(requestWithRetry(url));
+      });
+
+      let channelsList = {};
+      Promise.all(promises).then((results) => {
+        results.forEach((channels) => {
+          channels.forEach((channel) => {
+            let foundChannel = channelsList[channel._id];
+
+            if (!foundChannel) {
+              channelsList[channel._id] = channel;
+              foundChannel = channel;
             } else {
-              resolve(JSON.parse(raw));
+              foundChannel.timelines = foundChannel.timelines.concat(
+                channel.timelines
+              );
             }
           });
-        }
-        attempt();
-      });
-    }
-
-    let timeRanges = [];
-    for (let i = 0; i < 4; i++) {
-      let endMoment = moment(startMoment).add(6, "hours");
-      timeRanges.push([startMoment, endMoment]);
-      startMoment = endMoment;
-    }
-
-    let promises = [];
-    timeRanges.forEach((timeRange) => {
-      // 2020-03-24%2021%3A00%3A00.000%2B0000
-      let startTime = encodeURIComponent(
-        timeRange[0].format("YYYY-MM-DD HH:00:00.000ZZ")
-      );
-
-      // 2020-03-25%2005%3A00%3A00.000%2B0000
-      let stopTime = encodeURIComponent(
-        timeRange[1].format("YYYY-MM-DD HH:00:00.000ZZ")
-      );
-
-      let url = `https://api.pluto.tv/v2/channels?start=${startTime}&stop=${stopTime}`;
-      console.log(url);
-
-      promises.push(requestWithRetry(url));
-    });
-
-    let channelsList = {};
-    Promise.all(promises).then((results) => {
-      results.forEach((channels) => {
-        channels.forEach((channel) => {
-          foundChannel = channelsList[channel._id];
-
-          if (!foundChannel) {
-            channelsList[channel._id] = channel;
-            foundChannel = channel;
-          } else {
-            foundChannel.timelines = foundChannel.timelines.concat(
-              channel.timelines
-            );
-          }
         });
-      });
 
-      fullChannels = Object.values(channelsList);
-      sortedChannels = fullChannels.sort(
-        ({ number: a }, { number: b }) => a - b
-      );
-      console.log("[DEBUG] Using api.pluto.tv, writing cache.json.");
-      fs.writeFileSync("cache.json", JSON.stringify(sortedChannels));
-      callback(sortedChannels);
-      return;
-    })
-    .catch((err) => {
-      console.error(err);
-      process.exit(1);
+        let fullChannels = Object.values(channelsList);
+        let sortedChannels = fullChannels.sort(
+          ({ number: a }, { number: b }) => a - b
+        );
+        console.log("[DEBUG] Using api.pluto.tv, writing cache.json.");
+        fs.writeFileSync("cache.json", JSON.stringify(sortedChannels));
+        resolve(sortedChannels);
+      })
+      .catch((err) => {
+        reject(err);
+      });
     });
   },
 };
 
 module.exports = plutoIPTV;
 
-function processChannels(version, list) {
+// Generate EPG XML file (shared across all tuners - no session-specific data)
+function generateEPG(list) {
   let seenChannels = {};
   let channels = [];
   list.forEach((channel) => {
@@ -400,55 +399,9 @@ function processChannels(version, list) {
     channels.push(channel);
   });
 
-  ///////////////////
-  // M3U8 Playlist //
-  ///////////////////
-
-  let m3u8 = "#EXTM3U\n\n";
-  channels.forEach((channel) => {
-    if (
-      channel.isStitched &&
-      !channel.slug.match(/^announcement|^privacy-policy/)
-    ) {
-      // Construct authenticated stream URL
-      const stitcher = "https://cfd-v4-service-channel-stitcher-use1-1.prd.pluto.tv";
-      let m3uUrl = `${stitcher}/v2/stitch/hls/channel/${channel._id}/master.m3u8?${authData.stitcherParams}&jwt=${authData.sessionToken}&masterJWTPassthrough=true&includeExtendedEvents=true`;
-
-      let slug = conflictingChannels.includes(channel.slug)
-        ? `pluto-${channel.slug}`
-        : channel.slug;
-      let logo = channel.colorLogoPNG.path;
-      let group = channel.category;
-      let name = channel.name;
-      let art = channel.featuredImage.path
-        .replace("w=1600", "w=1000")
-        .replace("h=900", "h=562");
-      let guideDescription = channel.summary
-        .replace(/(\r\n|\n|\r)/gm, " ")
-        .replace('"', "")
-        .replace("”", "");
-      let channelNumber = start + parseInt(channel.number);
-
-      m3u8 =
-        m3u8 +
-        `#EXTINF:0 channel-id="${slug}" tvg-chno="${channelNumber}" channel-number="${channelNumber}" tvg-logo="${logo}" tvc-guide-art="${art}" tvc-guide-title="${name}" tvc-guide-description="${guideDescription}" group-title="${group}", ${name}
-${m3uUrl}
-
-`;
-      console.log("[INFO] Adding " + channel.name + " channel.");
-    } else {
-      console.log("[DEBUG] Skipping 'fake' channel " + channel.name + ".");
-    }
-  });
-
-  ///////////////////////////
-  // XMLTV Programme Guide //
-  ///////////////////////////
   let tv = [];
 
-  //////////////
-  // Channels //
-  //////////////
+  // Channels
   channels.forEach((channel) => {
     channel.slug = conflictingChannels.includes(channel.slug)
       ? `pluto-${channel.slug}`
@@ -469,9 +422,7 @@ ${m3uUrl}
         ],
       });
 
-      //////////////
-      // Episodes //
-      //////////////
+      // Episodes
       console.log("[INFO] Processing channel " + channel.name);
       if (channel.timelines) {
         channel.timelines.forEach((programme) => {
@@ -503,8 +454,8 @@ ${m3uUrl}
           mogrifiedGenres.push(["Drama", dramaGenres]);
 
           mogrifiedGenres.forEach((genrePackage) => {
-            genreName = genrePackage[0];
-            genres = genrePackage[1];
+            let genreName = genrePackage[0];
+            let genres = genrePackage[1];
 
             if (
               genres.includes(programme.episode.genre) ||
@@ -524,7 +475,7 @@ ${m3uUrl}
               .replace("h=660", "h=900");
           }
 
-          airing = {
+          let airing = {
             name: "programme",
             attrs: {
               start: moment(programme.start).format("YYYYMMDDHHmmss ZZ"),
@@ -658,27 +609,92 @@ ${m3uUrl}
     }
   );
 
-  epgFileName = version == "main" ? "epg.xml" : `${version}-epg.xml`;
-  playlistFileName =
-    version == "main" ? "playlist.m3u" : `${version}-playlist.m3u`;
-
-  fs.writeFileSync(epgFileName, epg);
-  console.log(`[SUCCESS] Wrote the EPG to ${epgFileName}!`);
-
-  fs.writeFileSync(playlistFileName, m3u8);
-  console.log(`[SUCCESS] Wrote the M3U8 tuner to ${playlistFileName}!`);
+  fs.writeFileSync("epg.xml", epg);
+  console.log(`[SUCCESS] Wrote the EPG to epg.xml!`);
 }
 
-// Main execution - authenticate first, then process channels
-authenticate()
-  .then(() => {
-    versions.forEach((version) => {
-      plutoIPTV.grabJSON(function (channels) {
-        processChannels(version, channels);
-      });
-    });
-  })
-  .catch((err) => {
+// Generate M3U8 playlist for a specific tuner with its own auth session
+function generatePlaylist(tunerName, list, authData) {
+  let seenChannels = {};
+  let channels = [];
+  list.forEach((channel) => {
+    if (seenChannels[channel.number]) {
+      return;
+    }
+    seenChannels[channel.number] = true;
+    channels.push(channel);
+  });
+
+  let m3u8 = "#EXTM3U\n\n";
+  channels.forEach((channel) => {
+    if (
+      channel.isStitched &&
+      !channel.slug.match(/^announcement|^privacy-policy/)
+    ) {
+      // Construct authenticated stream URL with tuner-specific JWT
+      const stitcher = "https://cfd-v4-service-channel-stitcher-use1-1.prd.pluto.tv";
+      let m3uUrl = `${stitcher}/v2/stitch/hls/channel/${channel._id}/master.m3u8?${authData.stitcherParams}&jwt=${authData.sessionToken}&masterJWTPassthrough=true&includeExtendedEvents=true`;
+
+      let slug = conflictingChannels.includes(channel.slug)
+        ? `pluto-${channel.slug}`
+        : channel.slug;
+      let logo = channel.colorLogoPNG.path;
+      let group = channel.category;
+      let name = channel.name;
+      let art = channel.featuredImage.path
+        .replace("w=1600", "w=1000")
+        .replace("h=900", "h=562");
+      let guideDescription = channel.summary
+        .replace(/(\r\n|\n|\r)/gm, " ")
+        .replace('"', "")
+        .replace("\u201D", "");
+      let channelNumber = start + parseInt(channel.number);
+
+      m3u8 =
+        m3u8 +
+        `#EXTINF:0 channel-id="${slug}" tvg-chno="${channelNumber}" channel-number="${channelNumber}" tvg-logo="${logo}" tvc-guide-art="${art}" tvc-guide-title="${name}" tvc-guide-description="${guideDescription}" group-title="${group}", ${name}
+${m3uUrl}
+
+`;
+      console.log(`[INFO] ${tunerName}: Adding ${channel.name} channel.`);
+    } else {
+      console.log(`[DEBUG] ${tunerName}: Skipping 'fake' channel ${channel.name}.`);
+    }
+  });
+
+  const playlistFileName = `${tunerName}-playlist.m3u`;
+  fs.writeFileSync(playlistFileName, m3u8);
+  console.log(`[SUCCESS] Wrote the M3U8 playlist to ${playlistFileName}!`);
+}
+
+// Main execution - authenticate each tuner, then generate files
+async function main() {
+  try {
+    console.log(`[INFO] Starting with ${tunerCount} tuner(s)...`);
+    console.log(`[INFO] Channel number offset: ${start}`);
+
+    // Authenticate each tuner with its own session
+    for (const tuner of tuners) {
+      const authData = await authenticate(tuner);
+      authSessions.set(tuner, authData);
+    }
+
+    // Fetch channels once (shared data)
+    const channels = await plutoIPTV.grabJSON();
+
+    // Generate EPG once (no session-specific data)
+    generateEPG(channels);
+
+    // Generate playlist for each tuner with its own auth
+    for (const tuner of tuners) {
+      generatePlaylist(tuner, channels, authSessions.get(tuner));
+    }
+
+    console.log(`[SUCCESS] Generated ${tunerCount} tuner playlist(s) and 1 EPG file.`);
+  } catch (err) {
     console.error('[ERROR] ' + err.message);
     process.exit(1);
-  });
+  }
+}
+
+main();
