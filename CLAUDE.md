@@ -12,7 +12,7 @@ Pluto TV requires authentication for streams to work. The converter authenticate
 
 - **Token validity:** 24 hours
 - **Refresh cycle:** Every 3 hours (in Docker entrypoint)
-- **Concurrent streams:** Pluto TV limits to 1 stream per session. The `TUNERS` feature creates multiple independent sessions with unique deviceIds to enable concurrent streaming.
+- **Concurrent streams:** Pluto TV limits to 1 stream per session. The converter creates 12 independent sessions with unique deviceIds to enable concurrent streaming.
 
 ## Build and Run Commands
 
@@ -24,13 +24,6 @@ docker build -t pluto-for-channels .
 docker run -d --restart unless-stopped --name pluto-for-channels -p 8080:80 \
   -e PLUTO_USERNAME='your@email.com' \
   -e PLUTO_PASSWORD='yourpassword' \
-  jonmaddox/pluto-for-channels
-
-# Run with multiple tuners for concurrent streams
-docker run -d -p 8080:80 \
-  -e PLUTO_USERNAME='your@email.com' \
-  -e PLUTO_PASSWORD='yourpassword' \
-  -e TUNERS=4 \
   jonmaddox/pluto-for-channels
 
 # Run with custom starting channel number
@@ -53,14 +46,11 @@ cp .env.example .env
 
 # Run the converter locally
 ./run.sh
-
-# Or run with multiple tuners
-TUNERS=4 ./run.sh
 ```
 
 ## Architecture
 
-- **`PlutoIPTV/index.js`** - Main converter that authenticates with Pluto TV (one session per tuner), fetches channel data via their API, generates M3U8 playlists (one per tuner) and a shared XMLTV EPG file. Handles caching (30 min), retries, and genre mapping.
+- **`PlutoIPTV/index.js`** - Main converter that authenticates with Pluto TV (12 independent sessions), fetches channel data via their API, generates 12 M3U8 playlists and a shared XMLTV EPG file. Handles caching (30 min), retries, and genre mapping.
 - **`PlutoIPTV/run.sh`** - Local development script that loads `.env` and runs the converter.
 - **`entrypoint.sh`** - Container entrypoint that runs nginx, executes the converter every 3 hours, and updates the status page with links to generated files.
 - **`index.html`** - Template for the status page served at the container's root URL.
@@ -71,23 +61,21 @@ TUNERS=4 ./run.sh
 
 - `PLUTO_USERNAME` - **(Required)** Pluto TV account email
 - `PLUTO_PASSWORD` - **(Required)** Pluto TV account password
-- `TUNERS` - Number of tuner playlists to generate (default: 1). Each tuner gets its own authenticated session for concurrent streaming.
 - `START` - Starting channel number offset (default: 10000). Channel 345 becomes 10345.
 
 ## Output Files
 
-- `tuner-{N}-playlist.m3u` - M3U playlist for each tuner with Channels-specific extensions (contains tuner-specific authenticated stream URLs with JWT)
+- `tuner-{1-12}-playlist.m3u` - 12 M3U playlists, each with its own authenticated session for concurrent streaming
 - `epg.xml` - Shared XMLTV format EPG data (no session-specific data)
 
 ## Multi-Tuner Setup with Channels DVR Server
 
-To enable concurrent Pluto TV streams in Channels DVR Server:
+12 tuners are available for concurrent streaming. Add as many as you need:
 
-1. Set `TUNERS=N` where N is your desired concurrent stream count
-2. In Channels DVR Server, add each tuner playlist as a separate Custom Channels source
-3. Set the "Stream Limit" dropdown to 1 for each source
-4. All tuners share the same EPG file and channel numbers (thanks to START default of 10000)
-5. Channels DVR Server will automatically failover between tuners
+1. In Channels DVR Server, add tuner playlists as separate Custom Channels sources
+2. Set the "Stream Limit" dropdown to 1 for each source
+3. All tuners share the same EPG file and channel numbers
+4. Channels DVR Server will automatically failover between tuners
 
 ## CI/CD
 
