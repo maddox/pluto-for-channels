@@ -39,32 +39,55 @@ function authenticate(tunerName) {
     const bootUrl = `https://boot.pluto.tv/v4/start?${bootParams.toString()}`;
     console.log(`[INFO] Authenticating ${tunerName} with Pluto TV (deviceId: ${deviceId.substring(0, 8)}...)...`);
 
-    request(bootUrl, function (err, response, body) {
-      if (err) {
-        reject(new Error(`Authentication request failed: ${err.message}`));
-        return;
-      }
+    const maxRetries = 10;
+    const timeoutMs = 30000; // 30 seconds
+    const retryDelayMs = 1000; // 1 second between retries
 
-      try {
-        const data = JSON.parse(body);
+    const attemptRequest = (attemptsLeft) => {
+      // Pass an options object to set the timeout
+      const requestOptions = {
+        url: bootUrl,
+        timeout: timeoutMs
+      };
 
-        if (!data.sessionToken) {
-          reject(new Error('Authentication failed: No session token in response'));
+      request(requestOptions, function (err, response, body) {
+        if (err) {
+          // Handle timeout or other network errors
+          if (attemptsLeft > 0) {
+            console.warn(`[WARN] Request failed, retrying in ${retryDelayMs}ms... (${attemptsLeft} attempts left). Error: ${err.message}`);
+            setTimeout(() => attemptRequest(attemptsLeft - 1), retryDelayMs);
+            return;
+          }
+          
+          reject(new Error(`Authentication request failed after retries: ${err.message}`));
           return;
         }
 
-        const authData = {
-          sessionToken: data.sessionToken,
-          stitcherParams: data.stitcherParams || '',
-          deviceId: deviceId,
-        };
+        try {
+          const data = JSON.parse(body);
 
-        console.log(`[INFO] ${tunerName} authentication successful`);
-        resolve(authData);
-      } catch (parseErr) {
-        reject(new Error(`Failed to parse authentication response: ${parseErr.message}`));
-      }
-    });
+          if (!data.sessionToken) {
+            reject(new Error('Authentication failed: No session token in response'));
+            return;
+          }
+
+          const authData = {
+            sessionToken: data.sessionToken,
+            stitcherParams: data.stitcherParams || '',
+            deviceId: deviceId, // Assuming deviceId is defined in the outer scope
+          };
+
+          console.log(`[INFO] ${tunerName} authentication successful`); // Assuming tunerName is in scope
+          resolve(authData);
+        } catch (parseErr) {
+          // Usually, parsing errors shouldn't be retried as the payload itself is malformed
+          reject(new Error(`Failed to parse authentication response: ${parseErr.message}`));
+        }
+      });
+    };
+
+    // Start the first attempt
+    attemptRequest(maxRetries);
   });
 }
 
