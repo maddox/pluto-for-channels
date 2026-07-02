@@ -1,10 +1,10 @@
 # Pluto for Channels (Archived)
 
-**This project is now archived. Due to how Pluto streams work with authentication, this project's archicture just does not scale appropriately for multiple stream needs.**
+**This project is now archived. Due to how Pluto streams work with authentication, this project's architecture just does not scale appropriately for multiple stream needs.**
 
-**You should migrate to the FastChannels project instead which handles authenticated Pluto streams better in that it supports multiple streams with a single authentication and a single source added to Channels.**
+**You should migrate to the [FastChannels](https://github.com/kineticman/FastChannels) project instead which handles authenticated Pluto streams better in that it supports multiple streams with a single authentication and a single source added to Channels.**
 
-**Additioanly, it supports more Pluto channels and locales. It also supports a TON of other FAST channel services.**
+**Additionally, it supports more Pluto channels and locales. It also supports a TON of other FAST channel services.**
 
 ## What is it
 
